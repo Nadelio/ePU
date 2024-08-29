@@ -25,7 +25,7 @@ Input:
   -> use in OS dev
   -> possibly also game dev?
   - "read input" instruction will keep a copy of the cell before an input to check if an input happened, will update upon reading a new input
-    - Add a `Clear Cell` VBA macro that clears the *Input Buffer* (the cell where inputs happen) when the clear command is given by the *Program Counter* to the *Command Unit* (*might be cheating*)
+    - Add a `Clear Cell` *VBA macro* that clears the *Input Buffer* (the cell where inputs happen) when the clear command is given by the *Program Counter* to the *Command Unit* (*might be cheating*)
 
 Output:
 

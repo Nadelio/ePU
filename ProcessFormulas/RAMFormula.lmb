@@ -1,0 +1,14 @@
+=IF(
+    AND(
+        A19 = "11",
+        A20 = DEC2BIN(COLUMN(A1) - 1),
+        A21 = DEC2BIN(ROW(A1) - 1)
+    ),
+    CONCAT(
+        B20,
+        B21,
+        B22,
+        B23
+    ),
+    A1
+)

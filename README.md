@@ -10,7 +10,7 @@ RAM:
 
 - Writing ✅  
 - Reading ✅  
-- Unit 🟨
+- Unit ✅
 
 Program Reader/Counter:
 
@@ -33,9 +33,9 @@ Output:
 
 ROM:
 
-- Writing  
-- Reading  
-- Unit
+- Writing ✅
+- Reading ✅
+- Unit 
 
 Assembly/BF:
 

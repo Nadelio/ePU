@@ -1,9 +1,10 @@
 CPU:
 
 - ALU ✅  
-- Control Unit (Sends commands to *Memory Management Unit* and the *ALU*, reads from/writes to *RAM Unit*, and writes to *Registers* for temporary program storage)  
-- Registers  
-- Memory Management Unit  
+- Control Unit (Sends commands to *Memory Management Unit* and the *ALU*, reads from/writes to *RAM Unit*, and writes to *Registers* for temporary program storage)
+  - 28 bits of Program Counter command memory 
+- Registers
+- Memory Management Unit
 - Clock ✅
 
 RAM:
@@ -41,12 +42,20 @@ Assembly/BF:
 
 - Parser
   - Instruction set
-    - BF tokens as 4-bit numbers for storage in ROM/Registers
-    - Add in `DPND` instruction
+    - `>>` -> Push to stack
+    - `<<` -> Pop from stack
+    - `%` -> Alias call
+      - Jump to memory address of Alias
+    - `$` -> System call
+      - Pass as a Control Unit command and not a Program Counter command
+    - `DPND`
       - Pulls another program into the Registers for use as a function
-    - `END` token to signal the end of a program
+    - `END`
+      - Signal the end of a program
 - Compiler
-  - BF instructions -> 4-bit numbers
+  - eBF instructions -> 4-bit numbers
+  - Byte-sized parameters (8-bit numbers)
+      - 3 parameters max
 
 
 <!-- [Vector Autopoint Circle Trace](https://www.desmos.com/calculator/kkoo6mhbwj) -->

@@ -13,6 +13,21 @@ public class DoubleByte {
     public byte getLowByte(){ return lowByte; }
     public int getSize(){ return size; }
 
+    public boolean isZero(){ return highByte == 0 && lowByte == 0; }
+
+    public void setHighByte(byte highByte){ this.highByte = highByte; }
+    public void setLowByte(byte lowByte){ this.lowByte = lowByte; }
+
+    public static DoubleByte convertToDoubleByte(int value){
+        byte highByte = (byte) (value >> 8);
+        byte lowByte = (byte) value;
+        return new DoubleByte(highByte, lowByte);
+    }
+
+    public int convertToInt(){
+        return (highByte << 8) | (lowByte & 0xFF);
+    }
+
     public DoubleByte AND(DoubleByte secondByte){
         byte newHighByte = (byte) (this.highByte & secondByte.getHighByte());
         byte newLowByte = (byte) (this.lowByte & secondByte.getLowByte());

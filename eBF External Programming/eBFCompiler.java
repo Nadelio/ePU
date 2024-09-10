@@ -98,7 +98,7 @@ public class eBFCompiler{
                             break;
                         case "END":
                             eBinCode += eBinTokens[13];
-                            eBFtoString += tokenNames[15];
+                            eBFtoString += tokenNames[17];
                             processedeBFCode += tokens[j];
                             break;
                         default:

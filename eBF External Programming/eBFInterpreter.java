@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.IOException;
 import java.util.Scanner;
+import java.util.HashMap;
 
 public class eBFInterpreter {
 
@@ -21,6 +22,7 @@ public class eBFInterpreter {
     // MISC VARS
     private static int tokenNumber = 0;
     private static boolean simMode = true;
+    private static HashMap<String, File> dependencies = new HashMap<String, File>();
 
     private static void interpretEBF(File eBFFile) {
         //TODO: implement eBF interpreter
@@ -58,7 +60,7 @@ public class eBFInterpreter {
                             } else if(eBinTokens[instructionPointer].equals("0110")) {
                                 openBrackets--;
                             } else {
-                                runInstruction(eBinTokens[instructionPointer]); // switch case with all the instructions except '[' and ']'
+                                i += runBinInstruction(new String[]{eBinTokens[instructionPointer], eBinTokens[instructionPointer+1], eBinTokens[instructionPointer+2], eBinTokens[instructionPointer+3]}); // switch case with all the instructions except '[' and ']'
                             }
                         }
                     }
@@ -76,7 +78,7 @@ public class eBFInterpreter {
                             } else if(eBinTokens[instructionPointer].equals("1011")) {
                                 throw new Exception("Looped Dependency Set Call" + tokenNumber);  
                             } else {
-                                runInstruction(eBinTokens[instructionPointer]); // switch case with all the instructions except '[' and ']'
+                                i += runBinInstruction(new String[]{eBinTokens[instructionPointer], eBinTokens[instructionPointer+1], eBinTokens[instructionPointer+2], eBinTokens[instructionPointer+3]}); // switch case with all the instructions except '[' and ']'
                             }
                         }
                     }
@@ -97,13 +99,25 @@ public class eBFInterpreter {
                     decrementStackPointer();
                     break;
                 case "1011":
-                    // Set Dependency //TODO: implement Dependency Set
+                    if(eBinTokens[i+1].contains(".")){ dependencies.put(eBinTokens[i+2], new File(eBinTokens[i+1])); i += 2; }
+                    else if(inSimMode()){ ePUx16Sim.loadDependency(eBinTokens[i+1], eBinTokens[i+2], eBinTokens[i+3]); i += 3; }
                     break;
                 case "1100":
-                    // Call Dependency Code //TODO: implement Dependency Call
+                    if(dependencies.containsKey(eBinTokens[i+1])){
+                        if(dependencies.get(eBinTokens[i+1]).getName().endsWith(".ebin")){
+                            interpretEBIN(dependencies.get(eBinTokens[i+1]));
+                            i++;
+                        } else if(dependencies.get(eBinTokens[i+1]).getName().endsWith(".ebf")){
+                            interpretEBF(dependencies.get(eBinTokens[i+1]));
+                            i++;
+                        } else {
+                            System.out.println("Error: Invalid Dependency File Type");
+                        }
+                    }
+                    else if(inSimMode()){ ePUx16Sim.runDependency(eBinTokens[i+1]); i++;}
                     break;
                 case "1101":
-                    if(inSimMode()){ ePUx16Sim.SystemCall(eBinTokens[i]); } //TODO: implement Sys Call
+                    if(inSimMode()){ ePUx16Sim.SystemCall(eBinTokens[i+1], eBinTokens[i+2], eBinTokens[i+3]); i += 3;} //TODO: implement Sys Call
                     break;
                 case "1110":
                     System.out.println("[END OF PROGRAM]");
@@ -137,15 +151,16 @@ public class eBFInterpreter {
                     System.out.println("Error: Invalid Flag");
                     System.exit(0);
                 }
-            }catch(Exception e){ e.printStackTrace(); }
+            } catch(Exception e){ e.printStackTrace(); }
         }
         simMode = false;
     }
 
     private static boolean inSimMode(){ return simMode; }
 
-    private static void runInstruction(String instruction) throws IOException {
-        switch(instruction){
+    private static int runBinInstruction(String[] instructions) throws IOException {
+        int tokensRead = 0;
+        switch(instructions[0]){
             case "0001":
                 incrementPointerValue();
                 break;
@@ -174,10 +189,22 @@ public class eBFInterpreter {
                 decrementStackPointer();
                 break;
             case "1100":
-                //TODO: Call Dependency Code
+                if(dependencies.containsKey(instructions[1])){
+                    if(dependencies.get(instructions[1]).getName().endsWith(".ebin")){
+                        interpretEBIN(dependencies.get(instructions[1]));
+                        tokensRead = 1;
+                    } else if(dependencies.get(instructions[1]).getName().endsWith(".ebf")){
+                        interpretEBF(dependencies.get(instructions[1]));
+                        tokensRead = 1;
+                    } else {
+                        System.out.println("Error: Invalid Dependency File Type");
+                    }
+                }
+                else if(inSimMode()){ ePUx16Sim.runDependency(instructions[1]); tokensRead = 1;}
                 break;
             case "1101":
-                if(inSimMode()){ ePUx16Sim.SystemCall(instruction); } //TODO: implement Sys Call
+                if(inSimMode()){ ePUx16Sim.SystemCall(instructions[1], instructions[2], instructions[3]); } //TODO: implement Sys Call
+                tokensRead = 3;
                 break;
             case "1110":
                 System.out.println("[END OF PROGRAM]");
@@ -186,6 +213,7 @@ public class eBFInterpreter {
                 break;
         }
         tokenNumber++;
+        return tokensRead;
     }
 
     private static void incrementStackPointer() {

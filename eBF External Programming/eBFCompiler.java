@@ -3,12 +3,12 @@ public class eBFCompiler{
 
     private static final String[] eBFTokens = {"+", "-", ">", "<", "[", "]", ",", ".", ">>", "<<", "DPND", "%", "$", "END"};
     private static final String[] eBinTokens = {"0001", "0010", "0011", "0100", "0101", "0110", "0111", "1000", "1001", "1010", "1011", "1100", "1101", "1110"};
-        private static final String[] tokenNames = {"{INCREMENT}", "{DECREMENT}", "{POINTER_INCREMENT}", "{POINTER_DECREMENT}", "{LOOP_START}", "{LOOP_END}", "{WRITE_TO_RAM}", "{INPUT}", "{PUSH_STACK}", "{POP_STACK}", "{DEPENDENCY}", "{DEPENDENCY_X_ADDRESS}", "{DEPENDENCY_Y_ADDRESS}", "{DEPENDENCY_ALIAS}", "{DEPENDENCY_CALL}", "{SYSTEM_CALL}", "{SYSTEM_CALL_VALUE}", "{END_PROGRAM}"};
-
+    private static final String[] tokenNames = {"{INCREMENT}", "{DECREMENT}", "{POINTER_INCREMENT}", "{POINTER_DECREMENT}", "{LOOP_START}", "{LOOP_END}", "{WRITE_TO_RAM}", "{INPUT}", "{PUSH_STACK}", "{POP_STACK}", "{DEPENDENCY}", "{DEPENDENCY_VALUE}", "{DEPENDENCY_X_ADDRESS}", "{DEPENDENCY_Y_ADDRESS}", "{DEPENDENCY_ALIAS}", "{DEPENDENCY_CALL}", "{SYSTEM_CALL}", "{SYSTEM_CALL_VALUE}", "{END_PROGRAM}"};
+                                              // 0,             1,             2,                     3,                     4,              5,            6,                7,         8,              9,             10,             11,                   12,                       13,                       14,                   15,                  16,              17,                    18
     private static String eBFtoString = "";
     private static String processedeBFCode = "";
 
-    private static String compile(String eBFCode){
+    private static String compile(String eBFCode) throws UnrecognizedTokenException{
         String eBinCode = "";
         
         // split eBF code into tokens
@@ -79,30 +79,37 @@ public class eBFCompiler{
                             processedeBFCode += tokens[j] + " ";
                             break;
                         case "DPND":
-                            eBinCode += eBinTokens[10] + " " + tokens[j+1] + " " + tokens[j+2] + " " + tokens[j+3] + " ";
-                            eBFtoString += tokenNames[10] + " " + tokenNames[11] + " " + tokenNames[12] + " " + tokenNames[13] + " ";
-                            processedeBFCode += tokens[j] + " " + tokens[j+1] + " " + tokens[j+2] + " " + tokens[j+3] + " ";
-                            j++;
+                            if(tokens[j+1].contains(".")){
+                                eBinCode += eBinTokens[10] + " " + tokens[j+1] + " " + tokens[j+2] + " ";
+                                eBFtoString += tokenNames[10] + " " + tokenNames[11] + " " + tokenNames[14] + " ";
+                                processedeBFCode += tokens[j] + " " + tokens[j+1] + " " + tokens[j+2] + " ";
+                                j += 2;
+                            } else {
+                                eBinCode += eBinTokens[10] + " " + tokens[j+1] + " " + tokens[j+2] + " " + tokens[j+3] + " ";
+                                eBFtoString += tokenNames[10] + " " + tokenNames[12] + " " + tokenNames[13] + " " + tokenNames[14] + " ";
+                                processedeBFCode += tokens[j] + " " + tokens[j+1] + " " + tokens[j+2] + " " + tokens[j+3] + " ";
+                                j += 3;
+                            }
                             break;
                         case "%":
                             eBinCode += eBinTokens[11] + " " + tokens[j+1] + " ";
-                            eBFtoString += tokenNames[12] + " " + tokenNames[13] + " ";
+                            eBFtoString += tokenNames[15] + " " + tokenNames[14] + " ";
                             processedeBFCode += tokens[j] + " " + tokens[j+1] + " ";
                             j++;
                             break;
                         case "$":
                             eBinCode += eBinTokens[12] + " " + tokens[j+1] + " " + tokens[j+2] + " " + tokens[j+3] + " ";
-                            eBFtoString += tokenNames[13] + " " + tokenNames[14] + " ";
+                            eBFtoString += tokenNames[16] + " " + tokenNames[17] + " ";
                             processedeBFCode += tokens[j] + " " + tokens[j+1] + " " + tokens[j+2] + " " + tokens[j+3] + " ";
-                            j++;
+                            j += 3;
                             break;
                         case "END":
                             eBinCode += eBinTokens[13];
-                            eBFtoString += tokenNames[17];
+                            eBFtoString += tokenNames[18];
                             processedeBFCode += tokens[j];
                             break;
                         default:
-                            break;
+                            throw new UnrecognizedTokenException("Unrecognized token: " + tokens[j] + " at index " + j);
                     }
                     break;
                 }
@@ -142,13 +149,16 @@ public class eBFCompiler{
         // add END token to eBF code if it doesn't already exist
         if(!eBFCode.endsWith("END")){ eBFCode += " END"; }
         
-        // compile eBF code
-        String eBinCode = compile(eBFCode);
-        
-        // output various stages of compilation
-        System.out.println("eBF: " + eBFCode);
-        System.out.println("eBin: " + eBinCode);
-        System.out.println("Processed eBF: " + processedeBFCode);
-        System.out.println("eBF Tokens: " + eBFtoString);
+        try {
+            // compile eBF code
+            String eBinCode;
+            eBinCode = compile(eBFCode);
+
+            // output various stages of compilation
+            System.out.println("eBF: " + eBFCode);
+            System.out.println("eBin: " + eBinCode);
+            System.out.println("Processed eBF: " + processedeBFCode);
+            System.out.println("eBF Tokens: " + eBFtoString);
+        } catch(UnrecognizedTokenException e) { e.printStackTrace(); }
     }
 }

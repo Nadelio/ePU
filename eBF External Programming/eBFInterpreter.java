@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.IOException;
 import java.util.Scanner;
+
 import java.util.HashMap;
 
 public class eBFInterpreter {
@@ -24,8 +25,103 @@ public class eBFInterpreter {
     private static boolean simMode = true;
     private static HashMap<String, File> dependencies = new HashMap<String, File>();
 
-    private static void interpretEBF(File eBFFile) {
-        //TODO: implement eBF interpreter
+    private static void interpretEBF(File eBFFile) throws Exception{
+        Scanner sc = new Scanner(eBFFile);
+        String eBFCode = "";
+        while(sc.hasNextLine()){ eBFCode += sc.nextLine() + " "; }
+        sc.close();
+
+        String[] eBFTokens = eBFCode.split(" ");
+        for(int i = 0; i < eBFTokens.length; i++){
+            switch(eBFTokens[i]){
+                case "+":
+                    incrementPointerValue();
+                    break;
+                case "-":
+                    decrementPointerValue();
+                    break;
+                case ">":
+                    movePointerRight();
+                    break;
+                case "<":
+                    movePointerLeft();
+                    break;
+                case "[":
+                    if (RAM[pointerX][pointerY].isZero()) {
+                        int openBrackets = 1;
+                        while(openBrackets != 0) {
+                            instructionPointer++;
+                            if(eBFTokens[instructionPointer].equals("[")) {
+                                openBrackets++;
+                            } else if(eBFTokens[instructionPointer].equals("]")) {
+                                openBrackets--;
+                            } else {
+                                i += runBFInstruction(new String[]{eBFTokens[instructionPointer], eBFTokens[instructionPointer+1], eBFTokens[instructionPointer+2], eBFTokens[instructionPointer+3]}); // switch case with all the instructions except '[' and ']'
+                            }
+                        }
+                    }
+                    break;
+                case "]":
+                    if (!RAM[pointerX][pointerY].isZero()) {
+                        int closeBrackets = 1;
+                        while(closeBrackets != 0) {
+                            instructionPointer--;
+                            if(eBFTokens[instructionPointer].equals("0101")) {
+                                closeBrackets--;
+                            } else if(eBFTokens[instructionPointer].equals("0110")) {
+                                closeBrackets++;
+                            } else if(eBFTokens[instructionPointer].equals("1011")) {
+                                throw new Exception("Looped Dependency Set Call" + tokenNumber);  
+                            } else {
+                                i += runBFInstruction(new String[]{eBFTokens[instructionPointer], eBFTokens[instructionPointer+1], eBFTokens[instructionPointer+2], eBFTokens[instructionPointer+3]}); // switch case with all the instructions except '[' and ']'
+                            }
+                        }
+                    }
+                    break;
+                case ",":
+                    RAM[pointerX][pointerY] = DoubleByte.convertToDoubleByte(pointerValue);
+                    break;
+                case ".":
+                    RAM[pointerX][pointerY].setHighByte((byte) System.in.read());
+                    RAM[pointerX][pointerY].setLowByte((byte) System.in.read());
+                    break;
+                case ">>":
+                    stack[stackPointer] = DoubleByte.convertToDoubleByte(pointerValue);
+                    incrementStackPointer();
+                    break;
+                case "<<":
+                    pointerValue = stack[stackPointer].convertToInt();
+                    decrementStackPointer();
+                    break;
+                case "DPND":
+                    if(eBFTokens[i+1].contains(".")){ dependencies.put(eBFTokens[i+2], new File(eBFTokens[i+1])); i += 2; }
+                    // else if(inSimMode()){ ePUx16Sim.loadDependency(eBFTokens[i+1], eBFTokens[i+2], eBFTokens[i+3]); i += 3; }
+                    break;
+                case "%":
+                    if(dependencies.containsKey(eBFTokens[i+1])){
+                        if(dependencies.get(eBFTokens[i+1]).getName().endsWith(".ebin")){
+                            interpretEBIN(dependencies.get(eBFTokens[i+1]));
+                            i++;
+                        } else if(dependencies.get(eBFTokens[i+1]).getName().endsWith(".ebf")){
+                            interpretEBF(dependencies.get(eBFTokens[i+1]));
+                            i++;
+                        } else {
+                            System.out.println("Error: Invalid Dependency File Type");
+                        }
+                    }
+                    // else if(inSimMode()){ ePUx16Sim.runDependency(eBFTokens[i+1]); i++;}
+                    break;
+                // case "$":
+                //     if(inSimMode()){ ePUx16Sim.SystemCall(eBFTokens[i+1], eBFTokens[i+2], eBFTokens[i+3]); i += 3;} //TODO: implement Sys Call
+                //     break;
+                case "END":
+                    System.out.println("[END OF PROGRAM]");
+                    break;
+                default:
+                    throw new UnrecognizedTokenException("Unrecognized Token: " + eBFTokens[i] + " at token number: " + tokenNumber);
+            }
+            tokenNumber++;
+        }
     }
 
     private static void interpretEBIN(File eBinaryFile) throws Exception{
@@ -50,7 +146,6 @@ public class eBFInterpreter {
                     movePointerLeft();
                     break;
                 case "0101":
-                    // '[' command: Jump to the matching ']' if the current cell value is zero
                     if (RAM[pointerX][pointerY].isZero()) {
                         int openBrackets = 1;
                         while(openBrackets != 0) {
@@ -66,7 +161,6 @@ public class eBFInterpreter {
                     }
                     break;
                 case "0110":
-                    // ']' command: Jump back to the matching '[' if the current cell value is non-zero
                     if (!RAM[pointerX][pointerY].isZero()) {
                         int closeBrackets = 1;
                         while(closeBrackets != 0) {
@@ -100,7 +194,7 @@ public class eBFInterpreter {
                     break;
                 case "1011":
                     if(eBinTokens[i+1].contains(".")){ dependencies.put(eBinTokens[i+2], new File(eBinTokens[i+1])); i += 2; }
-                    else if(inSimMode()){ ePUx16Sim.loadDependency(eBinTokens[i+1], eBinTokens[i+2], eBinTokens[i+3]); i += 3; }
+                    //else if(inSimMode()){ ePUx16Sim.loadDependency(eBinTokens[i+1], eBinTokens[i+2], eBinTokens[i+3]); i += 3; }
                     break;
                 case "1100":
                     if(dependencies.containsKey(eBinTokens[i+1])){
@@ -114,16 +208,16 @@ public class eBFInterpreter {
                             System.out.println("Error: Invalid Dependency File Type");
                         }
                     }
-                    else if(inSimMode()){ ePUx16Sim.runDependency(eBinTokens[i+1]); i++;}
+                    //else if(inSimMode()){ ePUx16Sim.runDependency(eBinTokens[i+1]); i++;}
                     break;
-                case "1101":
-                    if(inSimMode()){ ePUx16Sim.SystemCall(eBinTokens[i+1], eBinTokens[i+2], eBinTokens[i+3]); i += 3;} //TODO: implement Sys Call
-                    break;
+                // case "1101":
+                //     if(inSimMode()){ ePUx16Sim.SystemCall(eBinTokens[i+1], eBinTokens[i+2], eBinTokens[i+3]); i += 3;} //TODO: implement Sys Call
+                //     break;
                 case "1110":
                     System.out.println("[END OF PROGRAM]");
                     break;
                 default:
-                    break;
+                    throw new UnrecognizedTokenException("Unrecognized Token: " + eBinTokens[i] + " at token number: " + tokenNumber);
             }
             tokenNumber++;
         }
@@ -131,7 +225,7 @@ public class eBFInterpreter {
 
     public static void main(String[] args){
         if(args.length == 0){
-            System.out.println("Usage: java -jar eBinInterpreter.jar <flag> <eBin/eBF File>");
+            System.out.println("Usage: java -jar eBFInterpreter.jar <flag> <eBin/eBF File>");
             System.exit(0);
         } else if(args.length == 1){
             System.out.println("Error: Missing eBin/eBF File or Flag");
@@ -158,7 +252,65 @@ public class eBFInterpreter {
 
     private static boolean inSimMode(){ return simMode; }
 
-    private static int runBinInstruction(String[] instructions) throws IOException {
+    private static int runBFInstruction(String[] instructions) throws Exception {
+        int tokensRead = 0;
+        switch(instructions[0]){
+            case "+":
+                incrementPointerValue();
+                break;
+            case "-":
+                decrementPointerValue();
+                break;
+            case ">":
+                movePointerRight();
+                break;
+            case "<":
+                movePointerLeft();
+                break;
+            case ",":
+                RAM[pointerX][pointerY] = DoubleByte.convertToDoubleByte(pointerValue);
+                break;
+            case ".":
+                RAM[pointerX][pointerY].setHighByte((byte) System.in.read());
+                RAM[pointerX][pointerY].setLowByte((byte) System.in.read());
+                break;
+            case ">>":
+                stack[stackPointer] = DoubleByte.convertToDoubleByte(pointerValue);
+                incrementStackPointer();
+                break;
+            case "<<":
+                pointerValue = stack[stackPointer].convertToInt();
+                decrementStackPointer();
+                break;
+            case "%":
+                if(dependencies.containsKey(instructions[1])){
+                    if(dependencies.get(instructions[1]).getName().endsWith(".ebin")){
+                        interpretEBIN(dependencies.get(instructions[1]));
+                        tokensRead = 1;
+                    } else if(dependencies.get(instructions[1]).getName().endsWith(".ebf")){
+                        interpretEBF(dependencies.get(instructions[1]));
+                        tokensRead = 1;
+                    } else {
+                        System.out.println("Error: Invalid Dependency File Type");
+                    }
+                }
+                // else if(inSimMode()){ ePUx16Sim.runDependency(instructions[1]); tokensRead = 1;}
+                break;
+            // case "$":
+            //     if(inSimMode()){ ePUx16Sim.SystemCall(instructions[1], instructions[2], instructions[3]); }
+            //     tokensRead = 3;
+            //     break;
+            case "END":
+                System.out.println("[END OF PROGRAM]");
+                break;
+            default:
+                break;
+        }
+        tokenNumber++;
+        return tokensRead;
+    }
+
+    private static int runBinInstruction(String[] instructions) throws Exception {
         int tokensRead = 0;
         switch(instructions[0]){
             case "0001":
@@ -200,12 +352,12 @@ public class eBFInterpreter {
                         System.out.println("Error: Invalid Dependency File Type");
                     }
                 }
-                else if(inSimMode()){ ePUx16Sim.runDependency(instructions[1]); tokensRead = 1;}
+                // else if(inSimMode()){ ePUx16Sim.runDependency(instructions[1]); tokensRead = 1;}
                 break;
-            case "1101":
-                if(inSimMode()){ ePUx16Sim.SystemCall(instructions[1], instructions[2], instructions[3]); } //TODO: implement Sys Call
-                tokensRead = 3;
-                break;
+            // case "1101":
+            //     if(inSimMode()){ ePUx16Sim.SystemCall(instructions[1], instructions[2], instructions[3]); }
+            //     tokensRead = 3;
+            //     break;
             case "1110":
                 System.out.println("[END OF PROGRAM]");
                 break;

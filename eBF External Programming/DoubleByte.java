@@ -3,6 +3,7 @@ public class DoubleByte {
     private byte lowByte;
     private static int size = 16;
 
+    
     public DoubleByte(byte highByte, byte lowByte){
         this.highByte = highByte;
         this.lowByte = lowByte;

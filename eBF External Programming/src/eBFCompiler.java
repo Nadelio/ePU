@@ -1,4 +1,7 @@
 package src;
+
+import java.io.File;
+
 public class eBFCompiler{
     // this compiles eBF tokens into eBin
 
@@ -187,11 +190,13 @@ public class eBFCompiler{
 
             // write eBin code to file
             if(WRITE_FLAG){
-                System.out.println("Writing eBin code to eBin_" + args[1].substring(0, args[1].length() - 4) + ".eBin");
-                java.io.FileWriter fw = new java.io.FileWriter("eBin_" + args[1].substring(0, args[1].length() - 4) + ".eBin");
+                File inputFile = new File(args[1]);
+                File outputFile = new File(inputFile.getName().substring(0, inputFile.getName().length() - 4) + ".eBin");
+                System.out.println("Writing eBin code to " + outputFile.getName());
+                java.io.FileWriter fw = new java.io.FileWriter(outputFile);
                 fw.write(eBinCode);
                 fw.close();
-                System.out.println("Completed writting eBin code to eBin_" + args[1].substring(0, args[1].length() - 4) + ".eBin");
+                System.out.println("Completed writting eBin code to " + outputFile.getName());
             }
 
             // output various stages of compilation

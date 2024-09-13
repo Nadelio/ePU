@@ -15,7 +15,7 @@
 - `%`: call a dependency using its alias &rarr; `% <alias>`
 - `END`: declare the end of a eBF program
 
-- *character ascii codes start at 32
+- *printing to terminal follows Java Unicode Character Code Convention
 
 # Getting Started
 - ***The point of entry for using either the compiler or the interpreter is the `eBF.bash` file, so you will need a way to run said `eBF.bash` file***

@@ -5,7 +5,7 @@
 - `<`: decrement pointer position
 - `,`: write to RAM
 - `.`: ask for character, store character in current pointer position as `word`
-- `=`: write to terminal the value of the current pointer position as a character
+- `=`: write to terminal the value of the current pointer position as a character*
 - `[`: begin conditional loop, if current pointer position is `0` when conditional loop is met, skip, otherwise, loop until current pointer position is `0`
 - `]`: end conditional loop
 - `>>`: push current pointer value to stack
@@ -13,6 +13,8 @@
 - `DPND`: create a dependency using the next two tokens &rarr; `DPND <.ebf/.ebin file path> <alias>`
 - `%`: call a dependency using its alias &rarr; `% <alias>`
 - `END`: declare the end of a eBF program
+
+- *character ascii codes start at 32
 
 # Getting Started
 - ***The point of entry for using either the compiler or the interpreter is the `eBF.bash` file, so you will need a way to run said `eBF.bash` file***

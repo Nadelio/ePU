@@ -1,7 +1,7 @@
 if [ "$1" == "-c" ]; then
-    java -jar --enable-preview eBFCompiler.jar $2 $3 && echo "Compiled successfully" || echo "Failed to compile"
+    java -jar --enable-preview eBFCompiler.jar $2 $3
 elif [ "$1" == "-i" ]; then
-    java -jar --enable-preview eBFInterpreter.jar $2 $3 && echo "Interpreted successfully" || echo "Failed to interpret"
+    java -jar --enable-preview eBFInterpreter.jar $2 $3
 else
     if [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
         echo "Usage: eBF [-c|-i] <secondary flags> <file>"

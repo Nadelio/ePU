@@ -17,9 +17,6 @@ public class eBFInterpreter {
     private static DoubleByte[][] RAM = new DoubleByte[16][16];
     private static final int maxPointerValue = (int) Math.pow(2, 16) - 1;
     
-    // INSTRUCTION POINTER
-    private static int instructionPointer = 0;
-    
     // MISC VARS
     private static int tokenNumber = 0;
     private static boolean simMode = true;
@@ -47,34 +44,70 @@ public class eBFInterpreter {
                     movePointerLeft();
                     break;
                 case "[":
-                    if (RAM[pointerX][pointerY].isZero()) {
-                        int openBrackets = 1;
-                        while(openBrackets != 0) {
-                            instructionPointer++;
-                            if(eBFTokens[instructionPointer].equals("[")) {
+                    if(RAM[pointerX][pointerY].isZero()) {
+                        int openBrackets = 0;
+                        i++;
+                        while(openBrackets > 0 || !eBFTokens[i].equals("]")) { //TODO: Fix IndexOutOfBoundsException occurring here
+                            if(eBFTokens[i].equals("[")) {
                                 openBrackets++;
-                            } else if(eBFTokens[instructionPointer].equals("]")) {
+                            } else if(eBFTokens[i].equals("]")) {
                                 openBrackets--;
                             } else {
-                                i += runBFInstruction(new String[]{eBFTokens[instructionPointer], eBFTokens[instructionPointer+1], eBFTokens[instructionPointer+2], eBFTokens[instructionPointer+3]}); // switch case with all the instructions except '[' and ']'
+                                int numberOfTokensRemainingInProgram = eBFTokens.length - (i + 3);
+                                if(numberOfTokensRemainingInProgram > 0){ numberOfTokensRemainingInProgram = 1; }
+                                switch(numberOfTokensRemainingInProgram) {
+                                    case 1:
+                                        i += runBFInstruction(new String[]{eBFTokens[i], eBFTokens[i+1], eBFTokens[i+2], eBFTokens[i+3]});
+                                        break;
+                                    case 0:
+                                        i += runBFInstruction(new String[]{eBFTokens[i], eBFTokens[i+1], eBFTokens[i+2]});
+                                        break;
+                                    case -1:
+                                        i += runBFInstruction(new String[]{eBFTokens[i], eBFTokens[i+1]});
+                                        break;
+                                    case -2:
+                                        i += runBFInstruction(new String[]{eBFTokens[i]});
+                                        break;
+                                    default:
+                                        break;
+                                }
                             }
+                            i++;
                         }
                     }
                     break;
                 case "]":
-                    if (!RAM[pointerX][pointerY].isZero()) {
-                        int closeBrackets = 1;
-                        while(closeBrackets != 0) {
-                            instructionPointer--;
-                            if(eBFTokens[instructionPointer].equals("[")) {
-                                closeBrackets--;
-                            } else if(eBFTokens[instructionPointer].equals("]")) {
+                    if(!RAM[pointerX][pointerY].isZero()) {
+                        int closeBrackets = 0;
+                        i--;
+                        while(closeBrackets > 0 || !eBFTokens[i].equals("[")) {
+                            if(eBFTokens[i].equals("]")) {
                                 closeBrackets++;
-                            } else if(eBFTokens[instructionPointer].equals("DPND")) {
+                            } else if(eBFTokens[i].equals("[")) {
+                                closeBrackets--;
+                            } else if(eBFTokens[i].equals("DPND")) {
                                 throw new Exception("Looped Dependency Set Call" + tokenNumber);  
                             } else {
-                                i += runBFInstruction(new String[]{eBFTokens[instructionPointer], eBFTokens[instructionPointer+1], eBFTokens[instructionPointer+2], eBFTokens[instructionPointer+3]}); // switch case with all the instructions except '[' and ']'
+                                int numberOfTokensRemainingInProgram = eBFTokens.length - (i + 3);
+                                if(numberOfTokensRemainingInProgram > 0){ numberOfTokensRemainingInProgram = 1; }
+                                switch(numberOfTokensRemainingInProgram) {
+                                    case 1:
+                                        i += runBFInstruction(new String[]{eBFTokens[i], eBFTokens[i+1], eBFTokens[i+2], eBFTokens[i+3]});
+                                        break;
+                                    case 0:
+                                        i += runBFInstruction(new String[]{eBFTokens[i], eBFTokens[i+1], eBFTokens[i+2]});
+                                        break;
+                                    case -1:
+                                        i += runBFInstruction(new String[]{eBFTokens[i], eBFTokens[i+1]});
+                                        break;
+                                    case -2:
+                                        i += runBFInstruction(new String[]{eBFTokens[i]});
+                                        break;
+                                    default:
+                                        break;
+                                }
                             }
+                            i--;
                         }
                     }
                     break;
@@ -118,7 +151,6 @@ public class eBFInterpreter {
                 //     if(inSimMode()){ ePUx16Sim.SystemCall(eBFTokens[i+1], eBFTokens[i+2], eBFTokens[i+3]); i += 3;} //TODO: implement Sys Call
                 //     break;
                 case "END":
-                    System.out.println("[END OF PROGRAM]");
                     break;
                 default:
                     throw new UnrecognizedTokenException("Unrecognized Token: " + eBFTokens[i] + " at token number: " + tokenNumber);
@@ -150,33 +182,69 @@ public class eBFInterpreter {
                     break;
                 case "0101":
                     if (RAM[pointerX][pointerY].isZero()) {
-                        int openBrackets = 1;
-                        while(openBrackets != 0) {
-                            instructionPointer++;
-                            if(eBinTokens[instructionPointer].equals("0101")) {
+                        int openBrackets = 0;
+                        i++;
+                        while(openBrackets > 0 || !eBinTokens[i].equals("0110")) {
+                            if(eBinTokens[i].equals("0101")) {
                                 openBrackets++;
-                            } else if(eBinTokens[instructionPointer].equals("0110")) {
+                            } else if(eBinTokens[i].equals("0110")) {
                                 openBrackets--;
                             } else {
-                                i += runBinInstruction(new String[]{eBinTokens[instructionPointer], eBinTokens[instructionPointer+1], eBinTokens[instructionPointer+2], eBinTokens[instructionPointer+3]}); // switch case with all the instructions except '[' and ']'
+                                int numberOfTokensRemainingInProgram = eBinTokens.length - (i + 3);
+                                if(numberOfTokensRemainingInProgram > 0){ numberOfTokensRemainingInProgram = 1; }
+                                switch(numberOfTokensRemainingInProgram) {
+                                    case 1:
+                                        i += runBinInstruction(new String[]{eBinTokens[i], eBinTokens[i+1], eBinTokens[i+2], eBinTokens[i+3]});
+                                        break;
+                                    case 0:
+                                        i += runBinInstruction(new String[]{eBinTokens[i], eBinTokens[i+1], eBinTokens[i+2]});
+                                        break;
+                                    case -1:
+                                        i += runBinInstruction(new String[]{eBinTokens[i], eBinTokens[i+1]});
+                                        break;
+                                    case -2:
+                                        i += runBinInstruction(new String[]{eBinTokens[i]});
+                                        break;
+                                    default:
+                                        break;
+                                }
                             }
+                            i++;
                         }
                     }
                     break;
                 case "0110":
                     if (!RAM[pointerX][pointerY].isZero()) {
-                        int closeBrackets = 1;
-                        while(closeBrackets != 0) {
-                            instructionPointer--;
-                            if(eBinTokens[instructionPointer].equals("0101")) {
-                                closeBrackets--;
-                            } else if(eBinTokens[instructionPointer].equals("0110")) {
+                        int closeBrackets = 0;
+                        i--;
+                        while(closeBrackets > 0 || !eBinTokens[i].equals("0101")) {
+                            if(eBinTokens[i].equals("0110")) {
                                 closeBrackets++;
-                            } else if(eBinTokens[instructionPointer].equals("1011")) {
+                            } else if(eBinTokens[i].equals("0101")) {
+                                closeBrackets--;
+                            } else if(eBinTokens[i].equals("1011")) {
                                 throw new Exception("Looped Dependency Set Call" + tokenNumber);  
                             } else {
-                                i += runBinInstruction(new String[]{eBinTokens[instructionPointer], eBinTokens[instructionPointer+1], eBinTokens[instructionPointer+2], eBinTokens[instructionPointer+3]}); // switch case with all the instructions except '[' and ']'
+                                int numberOfTokensRemainingInProgram = eBinTokens.length - (i + 3);
+                                if(numberOfTokensRemainingInProgram > 0){ numberOfTokensRemainingInProgram = 1; }
+                                switch(numberOfTokensRemainingInProgram) {
+                                    case 1:
+                                        i += runBinInstruction(new String[]{eBinTokens[i], eBinTokens[i+1], eBinTokens[i+2], eBinTokens[i+3]});
+                                        break;
+                                    case 0:
+                                        i += runBinInstruction(new String[]{eBinTokens[i], eBinTokens[i+1], eBinTokens[i+2]});
+                                        break;
+                                    case -1:
+                                        i += runBinInstruction(new String[]{eBinTokens[i], eBinTokens[i+1]});
+                                        break;
+                                    case -2:
+                                        i += runBinInstruction(new String[]{eBinTokens[i]});
+                                        break;
+                                    default:
+                                        break;
+                                }
                             }
+                            i--;
                         }
                     }
                     break;
@@ -220,7 +288,6 @@ public class eBFInterpreter {
                 //     if(inSimMode()){ ePUx16Sim.SystemCall(eBinTokens[i+1], eBinTokens[i+2], eBinTokens[i+3]); i += 3;} //TODO: implement Sys Call
                 //     break;
                 case "1110":
-                    System.out.println("[END OF PROGRAM]");
                     break;
                 default:
                     throw new UnrecognizedTokenException("Unrecognized Token: " + eBinTokens[i] + " at token number: " + tokenNumber);
@@ -230,6 +297,8 @@ public class eBFInterpreter {
     }
 
     public static void main(String[] args){
+        initializeRAM();
+
         if(args.length == 0){
             System.out.println("Usage: java -jar eBFInterpreter.jar <flag> <eBin/eBF File>");
             System.exit(0);
@@ -254,6 +323,14 @@ public class eBFInterpreter {
             } catch(Exception e){ e.printStackTrace(); }
         }
         simMode = false;
+    }
+
+    private static void initializeRAM(){
+        for(int i = 0; i < 16; i++){
+            for(int j = 0; j < 16; j++){
+                RAM[i][j] = new DoubleByte((byte) 0x0000, (byte) 0x0000);
+            }
+        }
     }
 
     private static boolean inSimMode(){ return simMode; }
@@ -310,7 +387,6 @@ public class eBFInterpreter {
             //     tokensRead = 3;
             //     break;
             case "END":
-                System.out.println("[END OF PROGRAM]");
                 break;
             default:
                 break;
@@ -371,7 +447,6 @@ public class eBFInterpreter {
             //     tokensRead = 3;
             //     break;
             case "1110":
-                System.out.println("[END OF PROGRAM]");
                 break;
             default:
                 break;

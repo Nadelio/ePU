@@ -1,5 +1,5 @@
+package src;
 import java.io.File;
-import java.io.IOException;
 import java.util.Scanner;
 
 import java.util.HashMap;
@@ -66,11 +66,11 @@ public class eBFInterpreter {
                         int closeBrackets = 1;
                         while(closeBrackets != 0) {
                             instructionPointer--;
-                            if(eBFTokens[instructionPointer].equals("0101")) {
+                            if(eBFTokens[instructionPointer].equals("[")) {
                                 closeBrackets--;
-                            } else if(eBFTokens[instructionPointer].equals("0110")) {
+                            } else if(eBFTokens[instructionPointer].equals("]")) {
                                 closeBrackets++;
-                            } else if(eBFTokens[instructionPointer].equals("1011")) {
+                            } else if(eBFTokens[instructionPointer].equals("DPND")) {
                                 throw new Exception("Looped Dependency Set Call" + tokenNumber);  
                             } else {
                                 i += runBFInstruction(new String[]{eBFTokens[instructionPointer], eBFTokens[instructionPointer+1], eBFTokens[instructionPointer+2], eBFTokens[instructionPointer+3]}); // switch case with all the instructions except '[' and ']'
@@ -80,6 +80,9 @@ public class eBFInterpreter {
                     break;
                 case ",":
                     RAM[pointerX][pointerY] = DoubleByte.convertToDoubleByte(pointerValue);
+                    break;
+                case "=":
+                    System.out.print(RAM[pointerX][pointerY].convertToInt());
                     break;
                 case ".":
                     RAM[pointerX][pointerY].setHighByte((byte) System.in.read());
@@ -180,6 +183,9 @@ public class eBFInterpreter {
                 case "0111":
                     RAM[pointerX][pointerY] = DoubleByte.convertToDoubleByte(pointerValue);
                     break;
+                case "1111":
+                    System.out.print(RAM[pointerX][pointerY].convertToInt());
+                    break;
                 case "1000":
                     RAM[pointerX][pointerY].setHighByte((byte) System.in.read());
                     RAM[pointerX][pointerY].setLowByte((byte) System.in.read());
@@ -270,6 +276,9 @@ public class eBFInterpreter {
             case ",":
                 RAM[pointerX][pointerY] = DoubleByte.convertToDoubleByte(pointerValue);
                 break;
+            case "=":
+                System.out.print(RAM[pointerX][pointerY].convertToInt());
+                break;
             case ".":
                 RAM[pointerX][pointerY].setHighByte((byte) System.in.read());
                 RAM[pointerX][pointerY].setLowByte((byte) System.in.read());
@@ -327,6 +336,9 @@ public class eBFInterpreter {
                 break;
             case "0111":
                 RAM[pointerX][pointerY] = DoubleByte.convertToDoubleByte(pointerValue);
+                break;
+            case "1111":
+                System.out.print(RAM[pointerX][pointerY].convertToInt());
                 break;
             case "1000":
                 RAM[pointerX][pointerY].setHighByte((byte) System.in.read());

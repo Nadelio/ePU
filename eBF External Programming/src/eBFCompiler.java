@@ -1,10 +1,11 @@
+package src;
 public class eBFCompiler{
     // this compiles eBF tokens into eBin
 
-    private static final String[] eBFTokens = {"+", "-", ">", "<", "[", "]", ",", ".", ">>", "<<", "DPND", "%", "$", "END"};
-    private static final String[] eBinTokens = {"0001", "0010", "0011", "0100", "0101", "0110", "0111", "1000", "1001", "1010", "1011", "1100", "1101", "1110"};
-    private static final String[] tokenNames = {"{INCREMENT}", "{DECREMENT}", "{POINTER_INCREMENT}", "{POINTER_DECREMENT}", "{LOOP_START}", "{LOOP_END}", "{WRITE_TO_RAM}", "{INPUT}", "{PUSH_STACK}", "{POP_STACK}", "{DEPENDENCY}", "{DEPENDENCY_VALUE}", "{DEPENDENCY_X_ADDRESS}", "{DEPENDENCY_Y_ADDRESS}", "{DEPENDENCY_ALIAS}", "{DEPENDENCY_CALL}", "{SYSTEM_CALL}", "{SYSTEM_CALL_VALUE}", "{END_PROGRAM}"};
-                                              // 0,             1,             2,                     3,                     4,              5,            6,                7,         8,              9,             10,             11,                   12,                       13,                       14,                   15,                  16,              17,                    18
+    private static final String[] eBFTokens = {"+", "-", ">", "<", "[", "]", ",", ".", ">>", "<<", "DPND", "%", "$", "END", "="};
+    private static final String[] eBinTokens = {"0001", "0010", "0011", "0100", "0101", "0110", "0111", "1000", "1001", "1010", "1011", "1100", "1101", "1110", "1111"};
+    private static final String[] tokenNames = {"{INCREMENT}", "{DECREMENT}", "{POINTER_INCREMENT}", "{POINTER_DECREMENT}", "{LOOP_START}", "{LOOP_END}", "{WRITE_TO_RAM}", "{INPUT}", "{PUSH_STACK}", "{POP_STACK}", "{DEPENDENCY}", "{DEPENDENCY_VALUE}", "{DEPENDENCY_X_ADDRESS}", "{DEPENDENCY_Y_ADDRESS}", "{DEPENDENCY_ALIAS}", "{DEPENDENCY_CALL}", "{SYSTEM_CALL}", "{SYSTEM_CALL_VALUE}", "{END_PROGRAM}", "{WRITE_TO_TERMINAL}"};
+                                              // 0,             1,             2,                     3,                     4,              5,            6,                7,         8,              9,             10,             11,                   12,                       13,                       14,                   15,                  16,              17,                    18               19
     private static String eBFtoString = "";
     private static String processedeBFCode = "";
 
@@ -61,6 +62,11 @@ public class eBFCompiler{
                         case ",":
                             eBinCode += eBinTokens[6]  + " ";
                             eBFtoString += tokenNames[6] + " ";
+                            processedeBFCode += tokens[j] + " ";
+                            break;
+                        case "=":
+                            eBinCode += eBinTokens[14] + " ";
+                            eBFtoString += tokenNames[19] + " ";
                             processedeBFCode += tokens[j] + " ";
                             break;
                         case ".":
@@ -123,7 +129,7 @@ public class eBFCompiler{
         String eBFCode = "";
 
         // get eBF code from user
-        if(args.length > 0){
+        if(args.length == 2){
             if(args[0].equals("-f")){
                 try{
                     java.io.File file = new java.io.File(args[1]);
@@ -137,7 +143,9 @@ public class eBFCompiler{
                     System.exit(1);
                 }
             }
-            
+        } else if(args.length == 1){
+            System.out.println("Missing an argument.");
+            System.exit(1);
         } else {
             java.util.Scanner sc = new java.util.Scanner(System.in);
             System.out.print("CODE: ");

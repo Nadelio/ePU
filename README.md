@@ -1,5 +1,7 @@
 # ePUx16 Architecture
 
+![eBF/ePUx16 Logo](eBF_icon.svg)
+
 ### Overview
 - The ePUx16 is a computer hosted entirely on Excel, and is built primarily with Lambda as metacode, but also includes a 16-bit ALU built completely with logic gates
 - This project was made as a fun experiment. It is inspired by the various iterations of Excel Computers seen on Youtube

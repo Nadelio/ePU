@@ -21,11 +21,13 @@ public class eBFCompiler{
                 if(tokens[j].equals(eBFTokens[i])){
 
                     // output current and next token for debugging purposes
-                    System.out.println("Current Token: " + tokens[j]);
-                    try{
-                        System.out.println("Next Token: " + tokens[j+1] + "\n");
-                    } catch(ArrayIndexOutOfBoundsException e){
-                        System.out.println("Next Token: N/A\n");
+                    if(DEBUG_FLAG){
+                        System.out.println("Current Token: " + tokens[j]);
+                        try{
+                            System.out.println("Next Token: " + tokens[j+1] + "\n");
+                        } catch(ArrayIndexOutOfBoundsException e){
+                            System.out.println("Next Token: N/A\n");
+                        }
                     }
                     
                     // compile eBF tokens into eBin
@@ -130,13 +132,16 @@ public class eBFCompiler{
         return eBinCode;
     }
 
-    public static void main(String[] args){
+    public static boolean DEBUG_FLAG = false;
+    public static boolean WRITE_FLAG = false;
+
+    public static void main(String[] args) throws java.io.IOException{
 
         String eBFCode = "";
 
         // get eBF code from user
         if(args.length == 2){
-            if(args[0].equals("-f")){
+            if(args[0].contains("-f")){
                 try{
                     java.io.File file = new java.io.File(args[1]);
                     java.util.Scanner sc = new java.util.Scanner(file);
@@ -149,15 +154,27 @@ public class eBFCompiler{
                     System.exit(1);
                 }
             }
+
+            if(args[0].contains("-d")){
+                DEBUG_FLAG = true;
+            }
+
+            if(args[0].contains("-o")){
+                WRITE_FLAG = true;
+            }
+
         } else if(args.length == 1){
             System.out.println("Missing an argument.");
             System.exit(1);
-        } else {
+        } else if(args.length == 0) {
             java.util.Scanner sc = new java.util.Scanner(System.in);
             System.out.print("CODE: ");
             eBFCode = sc.nextLine();
             System.out.println("");
             sc.close();
+        } else {
+            System.out.println("Too many arguments.");
+            System.exit(1);
         }
 
         // add END token to eBF code if it doesn't already exist
@@ -168,11 +185,23 @@ public class eBFCompiler{
             String eBinCode;
             eBinCode = compile(eBFCode);
 
+            // write eBin code to file
+            if(WRITE_FLAG){
+                System.out.println("Writing eBin code to eBin_" + args[1].substring(0, args[1].length() - 4) + ".eBin");
+                java.io.FileWriter fw = new java.io.FileWriter("eBin_" + args[1].substring(0, args[1].length() - 4) + ".eBin");
+                fw.write(eBinCode);
+                fw.close();
+                System.out.println("Completed writting eBin code to eBin_" + args[1].substring(0, args[1].length() - 4) + ".eBin");
+            }
+
             // output various stages of compilation
-            System.out.println("eBF: " + eBFCode);
-            System.out.println("eBin: " + eBinCode);
-            System.out.println("Processed eBF: " + processedeBFCode);
-            System.out.println("eBF Tokens: " + eBFtoString);
+            if(DEBUG_FLAG){
+                System.out.println("eBF: " + eBFCode);
+                System.out.println("eBin: " + eBinCode);
+                System.out.println("Processed eBF: " + processedeBFCode);
+                System.out.println("eBF Tokens: " + eBFtoString);
+            }
+
         } catch(UnrecognizedTokenException e) { e.printStackTrace(); }
     }
 }

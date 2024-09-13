@@ -1,61 +1,22 @@
-CPU:
+# ePUx16 Architecture
 
-- ALU ✅  
-- Control Unit (Sends commands to *Memory Management Unit* and the *ALU*, reads from/writes to *RAM Unit*, and writes to *Registers* for temporary program storage)
-  - 28 bits of Program Counter command memory 
-- Registers
-- Memory Management Unit
-- Clock ✅
-
-RAM:
-
-- Writing ✅  
-- Reading ✅  
-- Unit ✅
-
-Program Reader/Counter:
-
-- Pointer (Program Reader/Counter will output what it reads into the *Control Unit*) 🟨  
-- Set to start of program  
-- Reset to start of program
-
-Input:
-
-- Input Buffer
-  - Reserve a cell that can be typed in and will be read at the *last character in the cell* when Program Counter reaches a `Read Input` instruction
-  -> use in OS dev
-  -> possibly also game dev?
-  - "read input" instruction will keep a copy of the cell before an input to check if an input happened, will update upon reading a new input
-    - Add a `Clear Cell` *VBA macro* that clears the *Input Buffer* (the cell where inputs happen) when the clear command is given by the *Program Counter* to the *Command Unit* (*might be cheating*)
-
-Output:
-
-- Screen (Gets inputs from *Control Unit*)
-
-ROM:
-
-- Writing ✅
-- Reading ✅
-- Unit 
-
-Assembly/BF:
-
-- Parser
-  - Instruction set
-    - `>>` -> Push to stack
-    - `<<` -> Pop from stack
-    - `%` -> Alias call
-      - Jump to memory address of Alias
-    - `$` -> System call
-      - Pass as a Control Unit command and not a Program Counter command
-    - `DPND`
-      - Pulls another program into the Registers for use as a function
-    - `END`
-      - Signal the end of a program
-- Compiler
-  - eBF instructions -> 4-bit numbers
-  - Byte-sized parameters (8-bit numbers)
-      - 3 parameters max
-
-
-<!-- [Vector Autopoint Circle Trace](https://www.desmos.com/calculator/kkoo6mhbwj) -->
+### Overview
+- The ePUx16 is a computer hosted entirely on Excel, and is built primarily with Lambda as metacode, but also includes a 16-bit ALU built completely with logic gates
+- This project was made as a fun experiment. It is inspired by the various iterations of Excel Computers seen on Youtube
+### Features
+- The features of the ePUx16 Architecture are:
+   - full eBF language support with 15 different symbols tailored around the development of low-level systems, including operating systems
+   - Excel's Lambda as metacode
+   - 16-bit central processor, RAM chip, ROM chip, and ALU chip
+   - User input
+   - Graphical interface (a screen)
+### Github Repository Contents
+- This Github Repository contains:
+    - The full ePUx16 Excel file
+    - An independently functioning eBF interpreter and compiler, built in Java
+    - A non-Excel simulator of the ePUx16 Architecture, built in Java
+    - Documentation on the eBF and eBin languages, and ePUx16 protocols
+    - A series of development tools used and built by Nadelio for use in the ePUx16 metacode and OS Environment
+    - A VSCode Extension with syntax highlighting for eBF
+    - A standard library built for use in the independently functioning eBF language
+    - Several miscellanous files from the development process, including diagrams, eBF/eBin keys, and full ePUx16 checklists

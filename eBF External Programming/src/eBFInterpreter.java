@@ -115,7 +115,7 @@ public class eBFInterpreter {
                     RAM[pointerX][pointerY] = DoubleByte.convertToDoubleByte(pointerValue);
                     break;
                 case "=":
-                    System.out.print(RAM[pointerX][pointerY].convertToInt());
+                    System.out.print((char) RAM[pointerX][pointerY].convertToInt());
                     break;
                 case ".":
                     RAM[pointerX][pointerY].setHighByte((byte) System.in.read());
@@ -252,7 +252,7 @@ public class eBFInterpreter {
                     RAM[pointerX][pointerY] = DoubleByte.convertToDoubleByte(pointerValue);
                     break;
                 case "1111":
-                    System.out.print(RAM[pointerX][pointerY].convertToInt());
+                    System.out.print((char) RAM[pointerX][pointerY].convertToInt());
                     break;
                 case "1000":
                     RAM[pointerX][pointerY].setHighByte((byte) System.in.read());
@@ -354,7 +354,7 @@ public class eBFInterpreter {
                 RAM[pointerX][pointerY] = DoubleByte.convertToDoubleByte(pointerValue);
                 break;
             case "=":
-                System.out.print(RAM[pointerX][pointerY].convertToInt());
+                System.out.print((char) RAM[pointerX][pointerY].convertToInt());
                 break;
             case ".":
                 RAM[pointerX][pointerY].setHighByte((byte) System.in.read());
@@ -414,7 +414,7 @@ public class eBFInterpreter {
                 RAM[pointerX][pointerY] = DoubleByte.convertToDoubleByte(pointerValue);
                 break;
             case "1111":
-                System.out.print(RAM[pointerX][pointerY].convertToInt());
+                System.out.print((char) RAM[pointerX][pointerY].convertToInt());
                 break;
             case "1000":
                 RAM[pointerX][pointerY].setHighByte((byte) System.in.read());

@@ -5,6 +5,7 @@
 - `<`: decrement pointer position
 - `,`: write to RAM
 - `.`: ask for character, store character in current pointer position as `word`
+- `=`: write to terminal the value of the current pointer position
 - `[`: begin conditional loop, if current pointer position is `0` when conditional loop is met, skip, otherwise, loop until current pointer position is `0`
 - `]`: end conditional loop
 - `>>`: push current pointer value to stack

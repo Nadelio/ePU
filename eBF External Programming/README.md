@@ -10,6 +10,7 @@
 - `]`: end conditional loop
 - `>>`: push current pointer value to stack
 - `<<`: pop top value from stack and store in pointer value
+- `'`: read from current pointer position in RAM
 - `DPND`: create a dependency using the next two tokens &rarr; `DPND <.ebf/.ebin file path> <alias>`
 - `%`: call a dependency using its alias &rarr; `% <alias>`
 - `END`: declare the end of a eBF program

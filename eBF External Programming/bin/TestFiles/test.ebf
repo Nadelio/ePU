@@ -1,2 +1,13 @@
 DPND .\..\bin\STD\std.ebf std % std
-% space = END
++ + + >>
++ + + >>
+% add ' >>
++ + + + +
++ + + + +
++ + + + +
++ + + + +
++ + + + +
++ + + + +
++ + >>
+% add =
+END

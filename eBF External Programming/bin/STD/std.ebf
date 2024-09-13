@@ -1,1 +1,1 @@
-DPND .\..\bin\STD\spaceChar.ebf space END
+DPND .\..\bin\STD\spaceChar.ebf space DPND .\..\bin\STD\add.ebf add END

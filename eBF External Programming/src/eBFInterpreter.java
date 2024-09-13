@@ -47,7 +47,7 @@ public class eBFInterpreter {
                     if(RAM[pointerX][pointerY].isZero()) {
                         int openBrackets = 0;
                         i++;
-                        while(openBrackets > 0 || !eBFTokens[i].equals("]")) { //TODO: Fix IndexOutOfBoundsException occurring here
+                        while(openBrackets > 0 || !eBFTokens[i].equals("]")) {
                             if(eBFTokens[i].equals("[")) {
                                 openBrackets++;
                             } else if(eBFTokens[i].equals("]")) {
@@ -114,7 +114,7 @@ public class eBFInterpreter {
                 case ",":
                     RAM[pointerX][pointerY] = DoubleByte.convertToDoubleByte(pointerValue);
                     break;
-                case "=":
+                case "=": // write to terminal
                     System.out.print((char) RAM[pointerX][pointerY].convertToInt());
                     break;
                 case ".":
@@ -147,7 +147,10 @@ public class eBFInterpreter {
                     }
                     // else if(inSimMode()){ ePUx16Sim.runDependency(eBFTokens[i+1]); i++;}
                     break;
-                // case "$":
+                case "'": // read from RAM
+                    pointerValue = RAM[pointerX][pointerY].convertToInt();
+                    break;
+                // case "$": // sys call
                 //     if(inSimMode()){ ePUx16Sim.SystemCall(eBFTokens[i+1], eBFTokens[i+2], eBFTokens[i+3]); i += 3;} //TODO: implement Sys Call
                 //     break;
                 case "END":
@@ -251,8 +254,8 @@ public class eBFInterpreter {
                 case "0111":
                     RAM[pointerX][pointerY] = DoubleByte.convertToDoubleByte(pointerValue);
                     break;
-                case "1111":
-                    System.out.print((char) RAM[pointerX][pointerY].convertToInt());
+                case "1101": // read from RAM
+                    pointerValue = RAM[pointerX][pointerY].convertToInt();
                     break;
                 case "1000":
                     RAM[pointerX][pointerY].setHighByte((byte) System.in.read());
@@ -284,10 +287,13 @@ public class eBFInterpreter {
                     }
                     //else if(inSimMode()){ ePUx16Sim.runDependency(eBinTokens[i+1]); i++;}
                     break;
-                // case "1101":
+                case "1110": // write to terminal
+                    System.out.print((char) RAM[pointerX][pointerY].convertToInt());
+                    break;
+                // case "1110": // sys call
                 //     if(inSimMode()){ ePUx16Sim.SystemCall(eBinTokens[i+1], eBinTokens[i+2], eBinTokens[i+3]); i += 3;} //TODO: implement Sys Call
                 //     break;
-                case "1110":
+                case "1111": // END
                     break;
                 default:
                     throw new UnrecognizedTokenException("Unrecognized Token: " + eBinTokens[i] + " at token number: " + tokenNumber);
@@ -298,6 +304,7 @@ public class eBFInterpreter {
 
     public static void main(String[] args){
         initializeRAM();
+        initializeStack();
 
         if(args.length == 0){
             System.out.println("Usage: java -jar eBFInterpreter.jar <flag> <eBin/eBF File>");
@@ -333,6 +340,12 @@ public class eBFInterpreter {
         }
     }
 
+    private static void initializeStack(){
+        for(int i = 0; i < stack.length; i++){
+            stack[i] = new DoubleByte((byte) 0x0000, (byte) 0x0000);
+        }
+    }
+
     private static boolean inSimMode(){ return simMode; }
 
     private static int runBFInstruction(String[] instructions) throws Exception {
@@ -353,12 +366,15 @@ public class eBFInterpreter {
             case ",":
                 RAM[pointerX][pointerY] = DoubleByte.convertToDoubleByte(pointerValue);
                 break;
-            case "=":
+            case "=": // write to terminal
                 System.out.print((char) RAM[pointerX][pointerY].convertToInt());
                 break;
             case ".":
                 RAM[pointerX][pointerY].setHighByte((byte) System.in.read());
                 RAM[pointerX][pointerY].setLowByte((byte) System.in.read());
+                break;
+            case "'": // read from RAM
+                pointerValue = RAM[pointerX][pointerY].convertToInt();
                 break;
             case ">>":
                 stack[stackPointer] = DoubleByte.convertToDoubleByte(pointerValue);
@@ -413,9 +429,6 @@ public class eBFInterpreter {
             case "0111":
                 RAM[pointerX][pointerY] = DoubleByte.convertToDoubleByte(pointerValue);
                 break;
-            case "1111":
-                System.out.print((char) RAM[pointerX][pointerY].convertToInt());
-                break;
             case "1000":
                 RAM[pointerX][pointerY].setHighByte((byte) System.in.read());
                 RAM[pointerX][pointerY].setLowByte((byte) System.in.read());
@@ -442,11 +455,17 @@ public class eBFInterpreter {
                 }
                 // else if(inSimMode()){ ePUx16Sim.runDependency(instructions[1]); tokensRead = 1;}
                 break;
-            // case "1101":
+            case "1101": // read from RAM
+                pointerValue = RAM[pointerX][pointerY].convertToInt();
+                break;
+            // case "1110": // sys call
             //     if(inSimMode()){ ePUx16Sim.SystemCall(instructions[1], instructions[2], instructions[3]); }
             //     tokensRead = 3;
             //     break;
-            case "1110":
+            case "1110": // write to terminal
+                System.out.print((char) RAM[pointerX][pointerY].convertToInt());
+                break;
+            case "1111": // END
                 break;
             default:
                 break;

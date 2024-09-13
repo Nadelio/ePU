@@ -1,6 +1,7 @@
 DPND .\..\bin\STD\spaceChar.ebf space
-DPND .\..\bin\STD\Lowercase_A_Char.ebf a
+DPND .\..\bin\STD\zeroChar.ebf zero
 DPND .\..\bin\STD\Uppercase_A_Char.ebf A
+DPND .\..\bin\STD\Lowercase_A_Char.ebf a
 DPND .\..\bin\STD\add.ebf add
 DPND .\..\bin\STD\clearPointerValue.ebf clearPointerValue
 DPND .\..\bin\STD\clearRAMValue.ebf clearRAMValue

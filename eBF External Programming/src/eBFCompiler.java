@@ -191,7 +191,7 @@ public class eBFCompiler{
             // write eBin code to file
             if(WRITE_FLAG){
                 File inputFile = new File(args[1]);
-                File outputFile = new File(inputFile.getName().substring(0, inputFile.getName().length() - 4) + ".eBin");
+                File outputFile = new File(inputFile.getName().substring(0, inputFile.getName().length() - 4) + ".ebin");
                 System.out.println("Writing eBin code to " + outputFile.getName());
                 java.io.FileWriter fw = new java.io.FileWriter(outputFile);
                 fw.write(eBinCode);

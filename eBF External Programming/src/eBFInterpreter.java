@@ -123,10 +123,12 @@ public class eBFInterpreter {
                     break;
                 case ">>":
                     stack[stackPointer] = DoubleByte.convertToDoubleByte(pointerValue);
+                    pointerValue = 0;
                     incrementStackPointer();
                     break;
                 case "<<":
                     pointerValue = stack[stackPointer].convertToInt();
+                    stack[stackPointer] = DoubleByte.convertToDoubleByte(0);
                     decrementStackPointer();
                     break;
                 case "DPND":
@@ -263,10 +265,12 @@ public class eBFInterpreter {
                     break;
                 case "1001":
                     stack[stackPointer] = DoubleByte.convertToDoubleByte(pointerValue);
+                    pointerValue = 0;
                     incrementStackPointer();
                     break;
                 case "1010":
                     pointerValue = stack[stackPointer].convertToInt();
+                    stack[stackPointer] = DoubleByte.convertToDoubleByte(0);
                     decrementStackPointer();
                     break;
                 case "1011":
@@ -378,10 +382,12 @@ public class eBFInterpreter {
                 break;
             case ">>":
                 stack[stackPointer] = DoubleByte.convertToDoubleByte(pointerValue);
+                pointerValue = 0;
                 incrementStackPointer();
                 break;
             case "<<":
                 pointerValue = stack[stackPointer].convertToInt();
+                stack[stackPointer] = DoubleByte.convertToDoubleByte(0);
                 decrementStackPointer();
                 break;
             case "%":
@@ -435,10 +441,12 @@ public class eBFInterpreter {
                 break;
             case "1001":
                 stack[stackPointer] = DoubleByte.convertToDoubleByte(pointerValue);
+                pointerValue = 0;
                 incrementStackPointer();
                 break;
             case "1010":
                 pointerValue = stack[stackPointer].convertToInt();
+                stack[stackPointer] = DoubleByte.convertToDoubleByte(0);
                 decrementStackPointer();
                 break;
             case "1100":

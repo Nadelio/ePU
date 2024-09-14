@@ -7,6 +7,9 @@
 - `add`
   - adds the top two stack values together and stores them in the current RAM slot
   - this sets the RAM slot immediately to the right of it to `0` as well
+- `sub`
+  - subtracts the top two stack values together and stores them in the current RAM slot
+  - this sets the RAM slot immediately to the right of it to `0` as well
 - `space`
   - sets the pointer value and the current RAM slot to `32` (the character code for ` `)
 - `zero`

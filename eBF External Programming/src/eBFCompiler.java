@@ -179,9 +179,6 @@ public class eBFCompiler{
             System.out.println("Too many arguments.");
             System.exit(1);
         }
-
-        // add END token to eBF code if it doesn't already exist
-        if(!eBFCode.endsWith("END")){ eBFCode += " END"; }
         
         try {
             // compile eBF code

@@ -115,7 +115,7 @@ public class eBFInterpreter {
                     RAM[pointerX][pointerY] = DoubleByte.convertToDoubleByte(pointerValue);
                     break;
                 case "=": // write to terminal
-                    System.out.print((char) RAM[pointerX][pointerY].convertToInt());
+                    System.out.print((char) (RAM[pointerX][pointerY].convertToInt() + 32));
                     break;
                 case ".":
                     RAM[pointerX][pointerY].setHighByte((byte) System.in.read());
@@ -292,7 +292,7 @@ public class eBFInterpreter {
                     //else if(inSimMode()){ ePUx16Sim.runDependency(eBinTokens[i+1]); i++;}
                     break;
                 case "1110": // write to terminal
-                    System.out.print((char) RAM[pointerX][pointerY].convertToInt());
+                    System.out.print((char) (RAM[pointerX][pointerY].convertToInt() + 32));
                     break;
                 // case "1110": // sys call
                 //     if(inSimMode()){ ePUx16Sim.SystemCall(eBinTokens[i+1], eBinTokens[i+2], eBinTokens[i+3]); i += 3;} //TODO: implement Sys Call
@@ -371,7 +371,7 @@ public class eBFInterpreter {
                 RAM[pointerX][pointerY] = DoubleByte.convertToDoubleByte(pointerValue);
                 break;
             case "=": // write to terminal
-                System.out.print((char) RAM[pointerX][pointerY].convertToInt());
+                System.out.print((char) (RAM[pointerX][pointerY].convertToInt() + 32));
                 break;
             case ".":
                 RAM[pointerX][pointerY].setHighByte((byte) System.in.read());
@@ -471,7 +471,7 @@ public class eBFInterpreter {
             //     tokensRead = 3;
             //     break;
             case "1110": // write to terminal
-                System.out.print((char) RAM[pointerX][pointerY].convertToInt());
+                System.out.print((char) (RAM[pointerX][pointerY].convertToInt() + 32));
                 break;
             case "1111": // END
                 break;

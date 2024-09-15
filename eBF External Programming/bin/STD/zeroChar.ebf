@@ -1,4 +1,3 @@
-DPND .\..\bin\STD\spaceChar.ebf space
-% space
-+ + + + + + + + + +
-+ + + + + + , END
+DPND .\..\bin\STD\clearPointerValue.ebf clearPointerValue
+% clearPointerValue
++ + + + + + + + + + + + + + + + , END

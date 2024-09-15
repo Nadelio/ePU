@@ -15,7 +15,8 @@
 - `%`: call a dependency using its alias &rarr; `% <alias>`
 - `END`: declare the end of a eBF program
 
-- *printing to terminal follows Java Unicode Character Code Convention
+- *printing to terminal adds 32 to the current RAM value being pointed at before printing
+- *printing to terminal follows the Java Character Code conventions
 
 # Getting Started
 - ***The point of entry for using either the compiler or the interpreter is the `eBF.bash` file, so you will need a way to run said `eBF.bash` file***

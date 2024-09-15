@@ -21,3 +21,6 @@
   - sets the pointer value and the current RAM slot to `33` (the character code for `A`)
 - `% a [  ]`
   - sets the pointer value and current RAM slot to `65` (the character code for `a`)
+
+<!-- function notation: % foo [ parameters in stack order at beginning of function ] --!>
+<!-- if a function changes the end state of more than one cell, add an end state note --!>

@@ -1,13 +1,13 @@
 DPND .\..\bin\STD\Lowercase_A_Char.ebf a
 DPND .\..\bin\STD\Uppercase_A_Char.ebf A
-DPND .\..\bin\STD\clearPointerValue.ebf clearPV
+DPND .\..\bin\STD\clear.ebf clear
 % A
 + + + + + + + , =
 % a
 + + + + , =
 + + + + + + + , = =
 + + + , =
-% clearPV
+% clear
 , =
 % A
 + + + + +
@@ -26,6 +26,6 @@ DPND .\..\bin\STD\clearPointerValue.ebf clearPV
 + , =
 % a
 + + + , =
-% clearPV
+% clear
 + , =
 END

@@ -1,8 +1,8 @@
 DPND .\..\bin\STD\std.ebf std % std
 + + + >>
 + + + + >>
-% add >>
+>>
+% multiply >>
 % zero >>
-% add
-=
+% add =
 END

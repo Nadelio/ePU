@@ -1,3 +1,3 @@
-DPND .\..\bin\STD\clearPointerValue.ebf clearPointerValue
-% clearPointerValue
+DPND .\..\bin\STD\clear.ebf clear
+% clear
 + + + + + + + + + + + + + + + + , END

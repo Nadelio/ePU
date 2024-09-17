@@ -48,7 +48,7 @@ A *function notation* is a quick representation of the beginning state of a func
  Top of stack  Bottom of stack
      \              /
 % foo [ a, b, c... ]
-   |     \ | /
+   ^     \ | /
    |  Stack parameters in stack order
 Function name
 ```

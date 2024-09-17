@@ -23,4 +23,7 @@
 - Put all 3 files (`eBF.bash`, `eBFCompiler.jar`, `eBFInterpreter.jar`) in a folder, then run the bash file using `bash eBF.bash -h`, this will give you all the flags, commands, and CLI syntax
 - To run a `.ebf` file, use `bash eBF.bash -i --eBF <file>`
 - To run a `.ebin` file, use `bash eBF.bash -i --eBin <file>`
-- To compile a .ebf file, use `bash eBF.bash -c -f <file>`, this will output the binary version of the .ebf file into the terminal, I am currently working on adding output file options to the compiler 
+- To compile a .ebf file, use `bash eBF.bash -c -f-o <file>`, this will output the binary file under the same file name but with the `.ebin` file extension
+- To debug the interpreter, add the `-d` flag to the `--eBF`/`--eBin` flag like:
+  - `--eBF-d`/`--eBin-d`
+  - this works the same way with the compiler

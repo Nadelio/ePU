@@ -14,8 +14,8 @@ public class eBFInterpreter {
     private static int pointerX = 0;
     private static int pointerY = 0;
     private static int pointerValue = 0;
-    private static DoubleByte[][] RAM = new DoubleByte[16][16];
-    private static final int maxPointerValue = (int) Math.pow(2, 16) - 1;
+    private static DoubleByte[][] RAM = new DoubleByte[256][256];
+    private static final int maxPointerValue = (int) Math.pow(2, 8) - 1;
     
     // MISC VARS
     private static int tokenNumber = 0;

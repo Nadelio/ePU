@@ -7,11 +7,12 @@ public class ControlUnit {
 
     public static void commandUnit(byte[] command){
         switch(command[0]){
-            case 0x00:
+            case 0x00: // stop computer
+                shutdownProtocol();
                 System.exit(0);
                 break;
-            case 0x01:
-                STARTED_FLAG = true;
+            case 0x01: // start computer
+                startupProtocol();
                 break;
             case 0x02:
                 if(STARTED_FLAG){
@@ -30,7 +31,7 @@ public class ControlUnit {
                 break;
             case 0x05:
                 if(STARTED_FLAG){
-                    ScreenUnit.writePixels(command[1], command[2], command[3]);
+                    ScreenUnit.writePixel(command[1], command[2], command[3]);
                 }
                 break;
             case 0x06:
@@ -40,6 +41,17 @@ public class ControlUnit {
                 break;
             case 0x07: // NO OP
                 break;
+            case 0x08:
+                if(STARTED_FLAG){
+                    ScreenUnit.clearScreen();
+                }
+                break;
+            case 0x09:
+                if(STARTED_FLAG){
+                    // first two command bytes are the location of the first piece of pixel data in RAM
+                    // the third command byte is the size of the pixel data (in words/DoubleBytes) (so 7 pixels at X:0 Y:0 would be ScreenUnit.pixelDataDump(0x00, 0x00, 0x07) )
+                    ScreenUnit.pixelDataDump(command[1], command[2], command[3]);
+                }
         }
     }
 
@@ -51,6 +63,22 @@ public class ControlUnit {
                 return ArithmeticLogicUnit.readData(); // Read result of ALU
             case 0x02:
                 return RAMUnit.readData(); // Read from RAM
+            default:
+                throw new IllegalArgumentException("Invalid operation byte: " + op);
         }
+    }
+
+    public static void shutdownProtocol(){
+        // write all data to file
+        ROMUnit.saveToFile();
+        STARTED_FLAG = false;
+        // add any other shutdown protocols here
+    }
+
+    public static void startupProtocol(){
+        // read all data from file
+        ROMUnit.loadFromFile();
+        STARTED_FLAG = true;
+        // add any other startup protocols here
     }
 }

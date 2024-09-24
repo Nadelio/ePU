@@ -1,5 +1,7 @@
 package ePUx16Sim;
 
+import java.io.IOException;
+
 import eBF.DoubleByte;
 
 public class ControlUnit {
@@ -72,7 +74,7 @@ public class ControlUnit {
 
     public static void shutdownProtocol(){
         // write all data to file
-        ROMUnit.saveToFile();
+        try { ROMUnit.saveToFile(); } catch (IOException e) { e.printStackTrace(); }
         STARTED_FLAG = false;
         // add any other shutdown protocols here
     }

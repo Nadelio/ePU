@@ -1,5 +1,9 @@
 package ePUx16Sim;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
 import eBF.DoubleByte;
 
 public class ROMUnit {
@@ -39,9 +43,53 @@ public class ROMUnit {
         - have the Program Counter read it
     */
 
-    public static void saveToFile() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'saveToFile'");
+    public static void saveToFile() throws IOException {
+        File memoryFile = new File("ROMraw.dat");
+        File protectedMemoryFile = new File("ROMprotected.dat");
+        File emptyMemoryFile = new File("ROMempty.dat");
+
+        // write ROM data to file
+        FileWriter fw = new FileWriter(memoryFile);
+
+        for(int i = 0; i < 256; i++){
+            for(int j = 0; j < 256; j++){
+                if(ROM[i][j] != null){
+                    fw.write(ROM[i][j] + " ");
+                }
+            }
+        }
+
+        fw.close();
+
+        // write protected memory data to file
+        fw = new FileWriter(protectedMemoryFile);
+
+        for(int i = 0; i < 256; i++){
+            for(int j = 0; j < 256; j++){
+                if(protectedMemory[i][j]){
+                    fw.write("true ");
+                } else {
+                    fw.write("false ");
+                }
+            }
+        }
+
+        fw.close();
+
+        // write empty memory data to file
+        fw = new FileWriter(emptyMemoryFile);
+
+        for(int i = 0; i < 256; i++){
+            for(int j = 0; j < 256; j++){
+                if(ROM[i][j].isZero()){
+                    fw.write("true ");
+                } else {
+                    fw.write("false");
+                }
+            }
+        }
+
+        fw.close();
     }
 
     public static void loadFromFile() {

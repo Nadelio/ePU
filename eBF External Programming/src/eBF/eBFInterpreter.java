@@ -275,8 +275,8 @@ public class eBFInterpreter {
     }
 
     private static void initializeRAM(){
-        for(int i = 0; i < 16; i++){
-            for(int j = 0; j < 16; j++){
+        for(int i = 0; i < 255; i++){
+            for(int j = 0; j < 255; j++){
                 RAM[i][j] = new DoubleByte((byte) 0x0000, (byte) 0x0000);
             }
         }
@@ -334,10 +334,10 @@ public class eBFInterpreter {
 
     private static void movePointerRight() {
         pointerX++;
-        if (pointerX == 15) {
+        if (pointerX == 255) {
             pointerX = 0;
             pointerY++;
-            if (pointerY == 15) {
+            if (pointerY == 255) {
                 pointerY = 0;
                 pointerX = 0;
             }
@@ -347,11 +347,11 @@ public class eBFInterpreter {
     private static void movePointerLeft() {
         pointerX--;
         if (pointerX == -1) {
-            pointerX = 15;
+            pointerX = 255;
             pointerY--;
             if (pointerY == -1) {
-                pointerY = 15;
-                pointerX = 15;
+                pointerY = 255;
+                pointerX = 255;
             }
         }
     }

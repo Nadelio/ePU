@@ -4,7 +4,7 @@ import eBF.DoubleByte;
 
 public class ProgramCounterUnit {
 
-    public static void requestStartProgram(byte b, byte c) {
+    public static void requestStartProgram(byte x, byte y) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'requestStartProgram'");
     }
@@ -14,7 +14,7 @@ public class ProgramCounterUnit {
     //! Don't forget to swap the '=' symbol with the '$' symbol in the embedded eBF compiler and interpreter
 
     //! primarily used for constants that are saved, like passwords, not for use with reading programs into PC Unit
-    public static DoubleByte readData() {
+    public static DoubleByte readData(byte x, byte y) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'readData'");
     }

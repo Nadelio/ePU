@@ -5,7 +5,7 @@ import eBF.DoubleByte;
 public class ControlUnit {
     private static boolean STARTED_FLAG = false;
 
-    public static void commandUnit(byte[] command){
+    public static void commandUnit(byte[] command){ // command -> { min size: 1 | max size: 5 }
         switch(command[0]){
             case 0x00: // stop computer
                 shutdownProtocol();
@@ -21,17 +21,17 @@ public class ControlUnit {
                 break;
             case 0x03:
                 if(STARTED_FLAG){
-                    RAMUnit.writeData(command[1], command[2], command[3]);
+                    RAMUnit.writeData(command[1], command[2], new DoubleByte(command[3], command[4]));
                 }
                 break;
             case 0x04:
                 if (STARTED_FLAG) {
-                    ROMUnit.requestWriteData(command[1], command[2], command[3]);
+                    ROMUnit.requestWriteData(command[1], command[2], new DoubleByte(command[3], command[4]));
                 }
                 break;
             case 0x05:
                 if(STARTED_FLAG){
-                    ScreenUnit.writePixel(command[1], command[2], command[3]);
+                    ScreenUnit.writePixel(command[1], command[2], new DoubleByte(command[3], command[4]));
                 }
                 break;
             case 0x06:
@@ -41,28 +41,30 @@ public class ControlUnit {
                 break;
             case 0x07: // NO OP
                 break;
-            case 0x08:
+            case 0x08: // clear screen
                 if(STARTED_FLAG){
                     ScreenUnit.clearScreen();
                 }
                 break;
-            case 0x09:
+            case 0x09: // dump pixel data
                 if(STARTED_FLAG){
-                    // first two command bytes are the location of the first piece of pixel data in RAM
-                    // the third command byte is the size of the pixel data (in words/DoubleBytes) (so 7 pixels at X:0 Y:0 would be ScreenUnit.pixelDataDump(0x00, 0x00, 0x07) )
-                    ScreenUnit.pixelDataDump(command[1], command[2], command[3]);
+                    ScreenUnit.pixelDataDump(command[1], command[2], new DoubleByte(command[3], command[4]));
+                }
+            case 0x10: // set protected memory
+                if(STARTED_FLAG){
+                    ROMUnit.setProtectedMemory(command[1], command[2], new DoubleByte(command[3], command[4]));
                 }
         }
     }
 
-    public static DoubleByte readFromMemory(byte op){
+    public static DoubleByte readFromMemory(byte op, byte x, byte y){
         switch(op){
             case 0x00:
-                return ProgramCounterUnit.readData(); // Equivalent to ROM read
+                return ProgramCounterUnit.readData(x, y); // Equivalent to ROM read
             case 0x01:
-                return ArithmeticLogicUnit.readData(); // Read result of ALU
+                return ArithmeticLogicUnit.readData(x, y); // Read result of ALU
             case 0x02:
-                return RAMUnit.readData(); // Read from RAM
+                return RAMUnit.readData(x, y); // Read from RAM
             default:
                 throw new IllegalArgumentException("Invalid operation byte: " + op);
         }
@@ -78,6 +80,7 @@ public class ControlUnit {
     public static void startupProtocol(){
         // read all data from file
         ROMUnit.loadFromFile();
+        ScreenUnit.intializeScreen();
         STARTED_FLAG = true;
         // add any other startup protocols here
     }

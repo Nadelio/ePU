@@ -1,11 +1,32 @@
 package ePUx16Sim;
 
+import eBF.DoubleByte;
+
 public class ROMUnit {
 
-    public static void requestWriteData(byte b, byte c, byte d) {
+    private static DoubleByte[][] ROM = new DoubleByte[256][256];
+    private static boolean[][] protectedMemory = new boolean[256][256];
+
+    public static void requestWriteData(byte x, byte y, DoubleByte data) { // check if x and y are within bounds and if data is overwriting protected memory
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'requestWriteData'");
     }
+
+    public static void requestWriteDataHeap(byte x, byte y, DoubleByte size) { // implement overflow protection rule here
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'requestWriteDataHeap'");
+    }
+
+    public static void setProtectedMemory(byte x, byte y, DoubleByte size) { // protected data rule
+        for(int i = 0; i < size.convertToInt(); i++){
+            protectedMemory[x & 0xFF][y & 0xFF] = true;
+            x++;
+            if(x == 256){
+                x = 0;
+                y++;
+            }
+        }
+    } // PC Unit will call this and protect the current program data
     
     /*
     1. Can't override protected data (define protected data via sys call)

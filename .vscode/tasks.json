@@ -1,0 +1,41 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Compile Java Files",
+            "type": "shell",
+            "command": "javac",
+            "args": [
+                "-d",
+                "eBF External Programming/bin/classFiles",
+                "./eBF External Programming/src/eBF/DoubleByte.java",
+                "./eBF External Programming/src/eBF/eBFInterpreter.java",
+                "./eBF External Programming/src/eBF/UnrecognizedTokenException.java"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": ["$javac"],
+            "detail": "Compiles DoubleByte.java, eBFInterpreter.java, and UnrecognizedTokenException.java"
+        },
+        {
+            "label": "Compile eBFInterpreter to .jar",
+            "type": "shell",
+            "command": "jar",
+            "args": [
+                "cvf",
+                "eBFInterpreter.jar",
+                "-C",
+                "eBF External Programming/bin",
+                "."
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "dependsOn": "Compile Java Files",
+            "problemMatcher": []
+        }
+    ]
+}

@@ -17,7 +17,7 @@ public class ArithmeticLogicUnit {
     // total of 24 bits or 3 bytes:
     // 0111OOOO AAAAAAAA BBBBBBBB
 
-    public static DoubleByte readData() {
+    public static DoubleByte readData(byte x, byte y) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'readData'");
     }

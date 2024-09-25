@@ -65,4 +65,8 @@ public class DoubleByte {
     public DoubleByte XNOR(DoubleByte secondByte){
         return this.XOR(secondByte).NOT();
     }
+
+    public String toString(){
+        return Integer.toBinaryString(highByte) + "" + Integer.toBinaryString(lowByte) + " ";
+    }
 }

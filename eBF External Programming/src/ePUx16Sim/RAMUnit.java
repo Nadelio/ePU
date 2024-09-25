@@ -3,8 +3,6 @@ package ePUx16Sim;
 import eBF.DoubleByte;
 
 public class RAMUnit {
-    //! Move RAM from eBF to ePUx16
-
     public static DoubleByte[][] RAM = new DoubleByte[256][256];
 
     public static void initalizeRAM(){

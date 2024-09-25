@@ -23,7 +23,6 @@ public class eBFInterpreter {
     private static int tokenNumber = 0;
     private static HashMap<String, File> dependencies = new HashMap<String, File>();
 
-    @Deprecated
     private static void interpretEBF(File eBFFile) throws Exception{
         Scanner sc = new Scanner(eBFFile);
         String eBFCode = "";
@@ -133,8 +132,7 @@ public class eBFInterpreter {
         }
     }
 
-    // TODO: Update the interpreter to handle bytes instead of 4 bit tokens
-    public static void interpretEBIN(File eBinaryFile) throws Exception{
+    private static void interpretEBIN(File eBinaryFile) throws Exception{
         Scanner sc = new Scanner(eBinaryFile);
         String eBinCode = "";
         while(sc.hasNextLine()){ eBinCode += sc.nextLine() + " "; }

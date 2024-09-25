@@ -32,6 +32,10 @@ public class ROMUnit {
         }
     } // PC Unit will call this and protect the current program data
     
+    public static DoubleByte readData(byte x, byte y) {
+        return ROM[x][y];
+    }
+
     /*
     1. Can't override protected data (define protected data via sys call)
         - OS data

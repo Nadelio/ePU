@@ -7,8 +7,8 @@ public class BIOS {
 
     // start computer -> call PC to load OS -> PC runs OS -> OS calls PC to load/run programs (multiple threads?)
 
-    public static void main(String [] args){
-        ControlUnit.commandUnit(new byte[]{0x01}); // start computer
-        ControlUnit.commandUnit(new byte[]{0x02, 0x00, 0x00}); // load and start OS
+    public static void main(String [] args) throws Exception{
+        ControlUnit.commandUnit(new byte[]{ 0x01, 0x00, 0x00, 0x00, 0x00 }); // start computer
+        ControlUnit.commandUnit(new byte[]{ 0x02, 0x00, 0x00, 0x00, 0x00 }); // load and start OS
     }
 }

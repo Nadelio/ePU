@@ -7,7 +7,7 @@ import eBF.DoubleByte;
 public class ControlUnit {
     private static boolean STARTED_FLAG = false;
 
-    public static void commandUnit(byte[] command){ // command -> { min size: 1 | max size: 5 }
+    public static void commandUnit(byte[] command) throws Exception { // command -> { min size: 1 | max size: 5 }
         switch(command[0]){
             case 0x00: // stop computer
                 shutdownProtocol();
@@ -18,7 +18,7 @@ public class ControlUnit {
                 break;
             case 0x02:
                 if(STARTED_FLAG){
-                    ProgramCounterUnit.requestStartProgram(command[1], command[2]);
+                    ProgramCounterUnit.requestStartProgram(command[1], command[2], new DoubleByte(command[3], command[4]));
                 }
                 break;
             case 0x03:
@@ -52,23 +52,22 @@ public class ControlUnit {
                 if(STARTED_FLAG){
                     ScreenUnit.pixelDataDump(command[1], command[2], new DoubleByte(command[3], command[4]));
                 }
+                break;
             case 0x10: // set protected memory
                 if(STARTED_FLAG){
                     ROMUnit.setProtectedMemory(command[1], command[2], new DoubleByte(command[3], command[4]));
                 }
-        }
-    }
-
-    public static DoubleByte readFromMemory(byte op, byte x, byte y){
-        switch(op){
-            case 0x00:
-                return ProgramCounterUnit.readData(x, y); // Equivalent to ROM read
-            case 0x01:
-                return ArithmeticLogicUnit.readData(x, y); // Read result of ALU
-            case 0x02:
-                return RAMUnit.readData(x, y); // Read from RAM
-            default:
-                throw new IllegalArgumentException("Invalid operation byte: " + op);
+                break;
+            case 0x11: // read from PC
+                if(STARTED_FLAG){
+                    eBF.eBFInterpreter.setPointerValue(ProgramCounterUnit.readData(command[1], command[2]));
+                }
+                break;
+            case 0x12: // read from ALU
+                if(STARTED_FLAG){
+                    eBF.eBFInterpreter.setPointerValue(ArithmeticLogicUnit.readData(command[1], command[2]));
+                }
+                break;
         }
     }
 

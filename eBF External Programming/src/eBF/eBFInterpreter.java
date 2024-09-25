@@ -23,6 +23,7 @@ public class eBFInterpreter {
     private static int tokenNumber = 0;
     private static HashMap<String, File> dependencies = new HashMap<String, File>();
 
+    @Deprecated
     private static void interpretEBF(File eBFFile) throws Exception{
         Scanner sc = new Scanner(eBFFile);
         String eBFCode = "";
@@ -132,7 +133,7 @@ public class eBFInterpreter {
         }
     }
 
-    private static void interpretEBIN(File eBinaryFile) throws Exception{
+    public static void interpretEBIN(File eBinaryFile) throws Exception{
         Scanner sc = new Scanner(eBinaryFile);
         String eBinCode = "";
         while(sc.hasNextLine()){ eBinCode += sc.nextLine() + " "; }
@@ -295,6 +296,7 @@ public class eBFInterpreter {
         }
     }
 
+    @Deprecated
     private static void debugStats(boolean flag, String token){
         if(flag){
             System.out.println("Pointer Value: " + pointerValue);

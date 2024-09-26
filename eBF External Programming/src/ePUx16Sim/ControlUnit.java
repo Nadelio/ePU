@@ -53,17 +53,17 @@ public class ControlUnit {
                     ScreenUnit.pixelDataDump(command[1], command[2], new DoubleByte(command[3], command[4]));
                 }
                 break;
-            case 0x10: // set protected memory
+            case 0x0A: // set protected memory
                 if(STARTED_FLAG){
                     ROMUnit.setProtectedMemory(command[1], command[2], new DoubleByte(command[3], command[4]));
                 }
                 break;
-            case 0x11: // read from PC
+            case 0x0B: // read from PC
                 if(STARTED_FLAG){
                     eBF.eBFInterpreter.setPointerValue(ProgramCounterUnit.readData(command[1], command[2]));
                 }
                 break;
-            case 0x12: // read from ALU
+            case 0x0C: // read from ALU
                 if(STARTED_FLAG){
                     eBF.eBFInterpreter.setPointerValue(ArithmeticLogicUnit.readData(command[1], command[2]));
                 }

@@ -17,7 +17,7 @@ public class ScreenUnit {
     private static JPanel panel;
     private static BufferedImage screenImage;
 
-    public static void intializeScreen(){ // add to startup protocol
+    public static void intializeScreen(){ // setup screen
         frame = new JFrame("ePUx16");
         screenImage = new BufferedImage(256, 256, BufferedImage.TYPE_INT_RGB);
         panel = new JPanel() {

@@ -1,2 +1,56 @@
 # ePU Documentation
 
+### Syscall Codes
+- `00000000` : Stop Computer
+  - This syscall will run the *Shutdown Protocol* which will save ROM data to `raw.rom`, `protected.rom`, and `empty.rom`
+- `00000001` : Start Computer
+  - This loads in the ROM data, Protected Memory data, initializes the RAM, and builds the Screen
+  - Loads in ROM data from `raw.rom`
+  - Loads in Protected Memory data from `protected.rom`
+- `00000010` : Load in and start a eBin program from ROM
+  - This syscall has two extra parameters: the X address and Y address of the first instruction in the program in the ROM
+- `00000011` : Write to RAM
+  - This syscall has 4 extra parameters: the X and Y address of the targeted RAM cell, and two unsigned bytes for the data written to the RAM cell
+- `00000100` : Request Single Write to ROM
+  - This syscall has 4 extra parameters: the X and Y address of the targeted ROM cell, and two unsigned bytes for the data written to the ROM cell
+  - Writing to ROM has a few rules:
+    - Can't write to protected memory cells
+    - Can't write out of bounds
+    - Can't write more data than is available
+- `00000101` : Single Write to Screen
+  - This syscall has 4 extra parameters: the X and Y address of the targeted pixel, and two unsigned bytes for the color written to the pixel
+- `00000110` : ALU Evaluate
+  - This syscall has 3 extra parameters: the OP unsigned byte, unsigned byte A, and unsigned byte B
+  - This syscall does not return any values, use syscall `00001100` to get ALU output
+  - OP codes:
+    - *assume op codes have `0000` appened to the left side of them*
+    - `0000`: Add A and B
+    - `0001`: Subtract B from A
+    - `0010`: Multiply A by B
+    - `0011`: Divide A by B (Integer Division)
+    - `0100`: Modulo A by B
+    - `0101`: AND A and B
+    - `0110`: OR A and B
+    - `0111`: XOR A and B
+    - `1000`: NOT A and B
+    - *anything not included here is consider a flush instruction, which will set the ALU output to `0`*
+- `00000111` : NO OP
+- `00001000` : Clear Screen
+  - Sets all pixels on the screen to black
+- `00001001` : Dump Write to Screen
+  - This syscall has 4 extra parameters: the X and Y address of the first targeted pixel, and the size of the data dump (which uses two Unsigned Bytes)
+  - This syscall will read from (i, 1) in the RAM until the given size is met, with i starting at 0, and incrementing until it equals the given size, the size of the data dump cannot be bigger than 255 or else an out of bounds error will be thrown and the system will crash
+- `00001010` : Set Protected Memory in ROM
+  - This syscall has 4 extra parameters: the X and Y address of the first targeted cell in the ROM, and the size of the protected memory
+  - Protected Memory cannot be overwritten
+  - Memory cannot be unprotected from inside of the system, it has to be done by editing the `protected.dat` file while the system is inactive
+- `00001011` : Read from ROM
+  - This syscall has 2 extra parameters: the X and Y address of the targeted cell in the ROM
+  - This syscall will set the Pointer Value to the value of the X and Y address of the targeted cell in the ROM
+  - This syscall does not read the targeted cell into the Registers
+  - Note: *This syscall is not meant for reading in programs, it is meant primarily for reading non-program memory, like passwords*
+- `00001100` : Read from ALU
+  - This syscall sets the Pointer Value to the output value stored in the ALU
+- `00001001` : Request Dump Write to ROM
+  - This syscall has 4 extra parameters: the X and Y address of the first targeted cell in ROM, and the size of the data dump (which uses two Unsigned Bytes)
+  - This syscall will read from (i, 0) in the RAM until the given size is met, with i starting at 0, and incrementing until it equals the given size, the size of the data dump cannot be bigger than 255 or else an out of bounds error will be thrown and the system will crash

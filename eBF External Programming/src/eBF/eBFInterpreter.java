@@ -4,13 +4,15 @@ import java.util.Scanner;
 
 import ePUx16Sim.ControlUnit;
 import ePUx16Sim.RAMUnit;
+import ePUx16Sim.Registers;
+import ePUx16Sim.UnsignedByte;
 
 import java.util.HashMap;
 
 public class eBFInterpreter {
 
     // STACK OPERATIONS
-    private static DoubleByte[] stack = new DoubleByte[256];
+    private static Word[] stack = new Word[256];
     private static int stackPointer = 0;
 
     // RAM OPERATIONS
@@ -21,7 +23,8 @@ public class eBFInterpreter {
     
     // MISC VARS
     private static int tokenNumber = 0;
-    private static HashMap<String, File> dependencies = new HashMap<String, File>();
+    private static HashMap<String, UnsignedByte[]> dependencies = new HashMap<String, UnsignedByte[]>();
+    private static HashMap<String, Word> dependencySizes = new HashMap<String, Word>();
 
     @Deprecated
     private static void interpretEBF(File eBFFile) throws Exception{
@@ -80,48 +83,45 @@ public class eBFInterpreter {
                     }
                     break;
                 case ",":
-                    RAMUnit.RAM[pointerX][pointerY] = DoubleByte.convertToDoubleByte(pointerValue);
+                    RAMUnit.RAM[pointerX][pointerY] = Word.convertToWord(pointerValue);
                     break;
                 case "=": // write to terminal
                     System.out.print((char) (RAMUnit.RAM[pointerX][pointerY].convertToInt() + 32));
                     break;
                 case ".":
-                    RAMUnit.RAM[pointerX][pointerY].setHighByte((byte) System.in.read());
-                    RAMUnit.RAM[pointerX][pointerY].setLowByte((byte) System.in.read());
+                    RAMUnit.RAM[pointerX][pointerY].setHighByte(new UnsignedByte(System.in.read()));
+                    RAMUnit.RAM[pointerX][pointerY].setLowByte(new UnsignedByte(System.in.read()));
                     break;
                 case ">>":
                     incrementStackPointer();
-                    stack[stackPointer] = DoubleByte.convertToDoubleByte(pointerValue);
+                    stack[stackPointer] = Word.convertToWord(pointerValue);
                     pointerValue = 0;
                     break;
                 case "<<":
                     pointerValue = stack[stackPointer].convertToInt();
-                    stack[stackPointer] = DoubleByte.convertToDoubleByte(0);
+                    stack[stackPointer] = Word.convertToWord(0);
                     decrementStackPointer();
                     break;
                 case "DPND":
-                    if(eBFTokens[i+1].contains(".")){ dependencies.put(eBFTokens[i+2], new File(eBFTokens[i+1])); i += 2; }
-                    // else if(inSimMode()){ ePUx16Sim.loadDependency(eBFTokens[i+1], eBFTokens[i+2], eBFTokens[i+3]); i += 3; }
+                    // if(eBFTokens[i+1].contains(".")){ dependencies.put(eBFTokens[i+2], new File(eBFTokens[i+1])); i += 2; }
                     break;
                 case "%":
-                    if(dependencies.containsKey(eBFTokens[i+1])){
-                        if(dependencies.get(eBFTokens[i+1]).getName().endsWith(".ebin")){
-                            interpretEBIN(dependencies.get(eBFTokens[i+1]));
-                            i++;
-                        } else if(dependencies.get(eBFTokens[i+1]).getName().endsWith(".ebf")){
-                            interpretEBF(dependencies.get(eBFTokens[i+1]));
-                            i++;
-                        } else {
-                            System.out.println("Error: Invalid Dependency File Type");
-                        }
-                    }
-                    // else if(inSimMode()){ ePUx16Sim.runDependency(eBFTokens[i+1]); i++;}
+                    // if(dependencies.containsKey(eBFTokens[i+1])){
+                    //     if(dependencies.get(eBFTokens[i+1]).getName().endsWith(".ebin")){
+                    //         interpretEBIN(dependencies.get(eBFTokens[i+1]));
+                    //         i++;
+                    //     } else if(dependencies.get(eBFTokens[i+1]).getName().endsWith(".ebf")){
+                    //         interpretEBF(dependencies.get(eBFTokens[i+1]));
+                    //         i++;
+                    //     } else {
+                    //         System.out.println("Error: Invalid Dependency File Type");
+                    //     }
+                    // }
                     break;
                 case "'": // read from RAM
                     pointerValue = RAMUnit.RAM[pointerX][pointerY].convertToInt();
                     break;
                 // case "$": // sys call
-                //     if(inSimMode()){ ePUx16Sim.SystemCall(eBFTokens[i+1], eBFTokens[i+2], eBFTokens[i+3]); i += 3;} //TODO: implement Sys Call
                 //     break;
                 case "END":
                     break;
@@ -141,101 +141,96 @@ public class eBFInterpreter {
 
         int c = 0;
 
-        String[] eBinTokens = eBinCode.split(" ");
+        String[] eBinStrings = eBinCode.split(" ");
+        UnsignedByte[] eBinTokens = toUnsignedByte(eBinStrings);
         for(int i = 0; i < eBinTokens.length; i++){
-            switch(eBinTokens[i]){
-                case "0001":
+            switch(eBinTokens[i].value){ // interpret eBin tokens
+                case 1: // increment pointer value
                     incrementPointerValue();
                     break;
-                case "0010":
+                case 2: // decrement pointer value
                     decrementPointerValue();
                     break;
-                case "0011":
+                case 3: // move pointer right
                     movePointerRight();
                     break;
-                case "0100":
+                case 4: // move pointer left
                     movePointerLeft();
                     break;
-                case "0101":
+                case 5: // [
                     if (RAMUnit.RAM[pointerX][pointerY].isZero()) {
                         i++;
-                        while(c > 0 || !eBinTokens[i].equals("0110")) {
-                            if(eBinTokens[i].equals("0101")) {
+                        while(c > 0 || !(eBinTokens[i].value == 6)) {
+                            if(eBinTokens[i].value == 5) {
                                 c++;
-                            } else if(eBinTokens[i].equals("0110")) {
+                            } else if(eBinTokens[i].value == 6) {
                                 c--;
-                            } else if(eBinTokens[i].equals("1011")) {
+                            } else if(eBinTokens[i].value == 12) {
                                 throw new Exception("Looped Dependency Set Call" + tokenNumber);  
                             }
                             i++;
                         }
                     }
                     break;
-                case "0110":
+                case 6: // ]
                     if (!RAMUnit.RAM[pointerX][pointerY].isZero()) {
                         i--;
-                        while(c > 0 || !eBinTokens[i].equals("0101")) {
+                        while(c > 0 || !(eBinTokens[i].value == 5)) {
                             
-                            if(eBinTokens[i].equals("0110")) {
+                            if(eBinTokens[i].value == 6) {
                                 c++;
-                            } else if(eBinTokens[i].equals("0101")) {
+                            } else if(eBinTokens[i].value == 5) {
                                 c--;
-                            } else if(eBinTokens[i].equals("1011")) {
+                            } else if(eBinTokens[i].value == 12) {
                                 throw new Exception("Looped Dependency Set Call" + tokenNumber);  
                             }
                             i--;
                         }
                     }
                     break;
-                case "0111":
-                    RAMUnit.RAM[pointerX][pointerY] = DoubleByte.convertToDoubleByte(pointerValue);
+                case 7: // write to RAM
+                    RAMUnit.RAM[pointerX][pointerY] = Word.convertToWord(pointerValue);
                     break;
-                case "1101": // read from RAM
+                case 8: // read from RAM
                     pointerValue = RAMUnit.RAM[pointerX][pointerY].convertToInt();
                     break;
-                case "1000":
-                    RAMUnit.RAM[pointerX][pointerY].setHighByte((byte) System.in.read());
-                    RAMUnit.RAM[pointerX][pointerY].setLowByte((byte) System.in.read());
+                case 9: // read from user
+                    RAMUnit.RAM[pointerX][pointerY].setHighByte(new UnsignedByte(System.in.read()));
+                    RAMUnit.RAM[pointerX][pointerY].setLowByte(new UnsignedByte(System.in.read()));
                     break;
-                case "1001":
+                case 10: // push
                     incrementStackPointer();
-                    stack[stackPointer] = DoubleByte.convertToDoubleByte(pointerValue);
+                    stack[stackPointer] = Word.convertToWord(pointerValue);
                     pointerValue = 0;
                     break;
-                case "1010":
+                case 11: // pop
                     pointerValue = stack[stackPointer].convertToInt();
-                    stack[stackPointer] = DoubleByte.convertToDoubleByte(0);
+                    stack[stackPointer] = Word.convertToWord(0);
                     decrementStackPointer();
                     break;
-                case "1011":
-                    // TODO: implement dependency loading
-                    if(eBinTokens[i+1].contains(".")){ dependencies.put(eBinTokens[i+2], new File(eBinTokens[i+1])); i += 2; }
+                case 12: // dependency load
+                    dependencies.put(eBinStrings[i+3], new UnsignedByte[]{ eBinTokens[i+1], eBinTokens[i+2] }); // ( Alias, { X, Y } )
+                    Word size = Word.convertToWord(Registers.findSize(dependencies.get(eBinStrings[i+3])[0], dependencies.get(eBinStrings[i+3])[1])); // ( Alias.x, Alias.y )
+                    Registers.readInProgram(dependencies.get(eBinStrings[i+3])[0], dependencies.get(eBinStrings[i+3])[1], size); // ( Alias.x, Alias.y, Size )
+                    dependencySizes.put(eBinStrings[i+1], size);
+                    i += 3;
                     break;
-                case "1100":
-                    // TODO: implement dependency running
-                    if(dependencies.containsKey(eBinTokens[i+1])){
-                        if(dependencies.get(eBinTokens[i+1]).getName().endsWith(".ebin")){
-                            interpretEBIN(dependencies.get(eBinTokens[i+1]));
-                            i++;
-                        } else if(dependencies.get(eBinTokens[i+1]).getName().endsWith(".ebf")){
-                            interpretEBF(dependencies.get(eBinTokens[i+1]));
-                            i++;
-                        } else {
-                            System.out.println("Error: Invalid Dependency File Type");
-                        }
+                case 13: // dependency call
+                    if(dependencies.containsKey(eBinStrings[i+1])){
+                        Registers.startProgram(dependencies.get(eBinStrings[i+1])[0], dependencies.get(eBinStrings[i+1])[1], dependencySizes.get(eBinStrings[i+1]));
                     }
                     break;
-                case "1110": // sys call
-                    ControlUnit.commandUnit(toByte(new String[]{ eBinTokens[i+1], eBinTokens[i+2], eBinTokens[i+3], eBinTokens[i+4], eBinTokens[i+5] }));
+                case 14: // sys call
+                    ControlUnit.commandUnit(new UnsignedByte[]{ eBinTokens[i+1], eBinTokens[i+2], eBinTokens[i+3], eBinTokens[i+4], eBinTokens[i+5] });
                     i += 5;
                     break;
-                case "1111": // END
+                case 15: // END
                     break;
                 default:
                     throw new UnrecognizedTokenException("Unrecognized Token: " + eBinTokens[i] + " at token number: " + tokenNumber);
             }
             tokenNumber++;
-            debugStats(DEBUG_FLAG, eBinTokens[i]);
+            debugStats(DEBUG_FLAG, eBinStrings[i]);
         }
     }
 
@@ -274,25 +269,31 @@ public class eBFInterpreter {
         }
     }
 
-    private static byte[] toByte(String[] s){
-        byte[] b = new byte[5];
-        for(int i = 0; i < 5; i++){
+    private static UnsignedByte[] toUnsignedByte(String[] s){
+        byte[] b = new byte[s.length];
+        for(int i = 0; i < s.length; i++){
             b[i] = (byte) Integer.parseInt(s[i], 2);
         }
-        return b;
+
+        UnsignedByte[] ub = new UnsignedByte[b.length];
+        for(int i = 0; i < b.length; i++){
+            ub[i] = new UnsignedByte(b[i]);
+        }
+        return ub;
     }
 
+    @Deprecated
     private static void initializeRAM(){
         for(int i = 0; i < 255; i++){
             for(int j = 0; j < 255; j++){
-                RAMUnit.RAM[i][j] = new DoubleByte((byte) 0x0000, (byte) 0x0000);
+                RAMUnit.RAM[i][j] = new Word(UnsignedByte.zero(), UnsignedByte.zero());
             }
         }
     }
 
     public static void initializeStack(){
         for(int i = 0; i < stack.length; i++){
-            stack[i] = new DoubleByte((byte) 0x0000, (byte) 0x0000);
+            stack[i] = new Word(UnsignedByte.zero(), UnsignedByte.zero());
         }
     }
 
@@ -363,5 +364,5 @@ public class eBFInterpreter {
         }
     }
 
-    public static void setPointerValue(DoubleByte value){ pointerValue = value.convertToInt(); }
+    public static void setPointerValue(Word value){ pointerValue = value.convertToInt(); }
 }

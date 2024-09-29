@@ -7,7 +7,7 @@ import java.awt.Graphics;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import eBF.DoubleByte;
+import eBF.Word;
 
 import java.awt.image.BufferedImage;
 
@@ -16,6 +16,9 @@ public class ScreenUnit {
     private static JFrame frame;
     private static JPanel panel;
     private static BufferedImage screenImage;
+
+    private static final int ramXMapAddress = 0;
+    private static final int ramYMapAddress = 1;
 
     public static void intializeScreen(){ // setup screen
         frame = new JFrame("ePUx16");
@@ -34,9 +37,9 @@ public class ScreenUnit {
         frame.setVisible(true);
     }
 
-    public static void writePixel(byte x, byte y, DoubleByte color) { // set a specific pixel to a specific color at location (x, y)
+    public static void writePixel(UnsignedByte x, UnsignedByte y, Word color) { // set a specific pixel to a specific color at location (x, y)
         Color c = ScreenUnit.getColor(color);
-        screenImage.setRGB(x & 0xFF, y & 0xFF, c.getRGB());
+        screenImage.setRGB(x.value, y.value, c.getRGB());
         panel.repaint();
     }
 
@@ -49,19 +52,27 @@ public class ScreenUnit {
         panel.repaint();
     }
 
-    public static void pixelDataDump(byte x, byte y, DoubleByte size) { // reads in pixel data from RAM at (x, y) until size is met
-        for (int i = 0; i < size.convertToInt(); i++) {
-            DoubleByte pixelData = RAMUnit.readData(x, y);
+    /**
+     * 
+     * @param x : x address of first piece area of pixels in screen
+     * @param y : y address of first piece area of pixels in screen
+     * @param size : Size is half the actual size of the read data
+     */
+    public static void pixelDataDump(UnsignedByte x, UnsignedByte y, Word size) { // reads in pixel data from RAM at (x, y) until size is met
+        if(size.convertToInt() == 0){ return; }
+        if(size.convertToInt() > 256){ return; }
+        int i;
+        for (i = 0; i < size.convertToInt(); i++) {
+            Word pixelData = RAMUnit.readData(new UnsignedByte(ramXMapAddress + i), new UnsignedByte(ramYMapAddress + i));
             ScreenUnit.writePixel(x, y, pixelData);
-            x++;
-            if (x == 256) {
-                x = 0;
-                y++;
+            x.value++;
+            if (x.value == 256) {
+                y.value++;
             }
         }
     }
 
-    private static Color getColor(DoubleByte color) {
+    private static Color getColor(Word color) {
         int value = color.convertToInt();
         int red = (value & 0xFF0000) >> 16;
         int green = (value & 0x00FF00) >> 8;

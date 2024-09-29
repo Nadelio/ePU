@@ -8,7 +8,10 @@ public class BIOS {
     // start computer -> call PC to load OS -> PC runs OS -> OS calls PC to load/run programs (multiple threads?)
 
     public static void main(String [] args) throws Exception{
-        ControlUnit.commandUnit(new byte[]{ 0x01, 0x00, 0x00, 0x00, 0x00 }); // start computer
-        ControlUnit.commandUnit(new byte[]{ 0x02, 0x00, 0x00, 0x00, 0x00 }); // load and start OS
+        UnsignedByte zero = UnsignedByte.zero();
+        UnsignedByte one = new UnsignedByte(1);
+        UnsignedByte two = new UnsignedByte(2);
+        ControlUnit.commandUnit(new UnsignedByte[]{ one }); // start computer
+        ControlUnit.commandUnit(new UnsignedByte[]{ two, zero, zero, zero, zero }); // load and start OS ( 2 : { x, y } { size } )
     }
 }

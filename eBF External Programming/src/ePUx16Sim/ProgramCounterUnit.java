@@ -1,10 +1,10 @@
 package ePUx16Sim;
 
-import eBF.DoubleByte;
+import eBF.Word;
 
 public class ProgramCounterUnit {
 
-    public static void requestStartProgram(byte x, byte y, DoubleByte size) throws Exception {
+    public static void requestStartProgram(UnsignedByte x, UnsignedByte y, Word size) throws Exception {
         Registers.readInProgram(x, y, size);
         Registers.startProgram(x, y, size);
     }
@@ -14,5 +14,5 @@ public class ProgramCounterUnit {
     //! Don't forget to swap the '=' symbol with the '$' symbol in the embedded eBF compiler
 
     //! primarily used for constants that are saved, like passwords, not for use with reading programs into PC Unit
-    public static DoubleByte readData(byte x, byte y) { return ROMUnit.readData(x, y); }
+    public static Word readData(UnsignedByte x, UnsignedByte y) { return ROMUnit.readData(x, y); }
 }

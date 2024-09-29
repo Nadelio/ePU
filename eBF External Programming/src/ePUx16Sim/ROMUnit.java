@@ -4,37 +4,47 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import eBF.DoubleByte;
+import eBF.Word;
 
 public class ROMUnit {
 
-    private static DoubleByte[][] ROM = new DoubleByte[256][256];
+    private static final int ramXMapAddress = 0;
+    private static final int ramYMapAddress = 0;
+
+    private static Word[][] ROM = new Word[256][256];
     private static boolean[][] protectedMemory = new boolean[256][256];
 
-    public static void requestWriteData(byte x, byte y, DoubleByte data) { // check if x and y are within bounds and if data is overwriting protected memory
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'requestWriteData'");
+    public static void requestWriteData(UnsignedByte x, UnsignedByte y, Word data) {
+        if(x.value < 0 || x.value > 255 || y.value < 0 || y.value > 255){ return; }
+        if(protectedMemory[x.value][y.value]){ return; }
+        ROM[x.value][y.value] = data;
     }
 
-    public static void requestWriteDataHeap(byte x, byte y, DoubleByte size) { // implement overflow protection rule here
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'requestWriteDataHeap'");
-    }
-
-    public static void setProtectedMemory(byte x, byte y, DoubleByte size) { // protected data rule
+    public static void requestWriteDataHeap(UnsignedByte x, UnsignedByte y, Word size) {
         for(int i = 0; i < size.convertToInt(); i++){
-            protectedMemory[x & 0xFF][y & 0xFF] = true;
-            x++;
-            if(x == 256){
-                x = 0;
-                y++;
+            if(x.value < 0 || x.value > 255 || y.value < 0 || y.value > 255){ return; }
+            if(protectedMemory[x.value][y.value]){ return; }
+            ROM[x.value][y.value] = RAMUnit.readData(new UnsignedByte(ramXMapAddress + i), new UnsignedByte(ramYMapAddress + i));
+            x.value++;
+            if(x.value == 256){
+                x.value = 0;
+                y.value++;
+            }
+        }
+    }
+
+    public static void setProtectedMemory(UnsignedByte x, UnsignedByte y, Word size) { // protected data rule //! possible iteration issue, check ScreenUnit data dump method for possible solution
+        for(int i = 0; i < size.convertToInt(); i++){
+            protectedMemory[x.value][y.value] = true;
+            x.value++;
+            if(x.value == 256){
+                x.value = 0;
+                y.value++;
             }
         }
     } // PC Unit will call this and protect the current program data
     
-    public static DoubleByte readData(byte x, byte y) {
-        return ROM[x][y];
-    }
+    public static Word readData(UnsignedByte x, UnsignedByte y) { return ROM[x.value][y.value]; }
 
     /*
     1. Can't override protected data (define protected data via sys call)
@@ -97,10 +107,8 @@ public class ROMUnit {
     }
 
     public static void loadFromFile() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'loadFromFile'");
+        // read ROM data from file
+        // read protected memory data from file
+        // read empty memory data from file
     }
-
-    // ROM written to a file that is then read into ROM on startup via BIOS
-    // before stopping computer, write all ROM data to file
 }

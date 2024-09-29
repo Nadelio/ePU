@@ -2,70 +2,70 @@ package ePUx16Sim;
 
 import java.io.IOException;
 
-import eBF.DoubleByte;
+import eBF.Word;
 
 public class ControlUnit {
     private static boolean STARTED_FLAG = false;
 
-    public static void commandUnit(byte[] command) throws Exception { // command -> { min size: 1 | max size: 5 }
-        switch(command[0]){
-            case 0x00: // stop computer
+    public static void commandUnit(UnsignedByte[] command) throws Exception { // command -> { min size: 1 | max size: 5 }
+        switch(command[0].value){
+            case 0: // stop computer
                 shutdownProtocol();
                 System.exit(0);
                 break;
-            case 0x01: // start computer
+            case 1: // start computer
                 startupProtocol();
                 break;
-            case 0x02:
+            case 2:
                 if(STARTED_FLAG){
-                    ProgramCounterUnit.requestStartProgram(command[1], command[2], new DoubleByte(command[3], command[4]));
+                    ProgramCounterUnit.requestStartProgram(command[1], command[2], Word.convertToWord(Registers.findSize(command[1], command[2])));
                 }
                 break;
-            case 0x03:
+            case 3:
                 if(STARTED_FLAG){
-                    RAMUnit.writeData(command[1], command[2], new DoubleByte(command[3], command[4]));
+                    RAMUnit.writeData(command[1], command[2], new Word(command[3], command[4]));
                 }
                 break;
-            case 0x04:
+            case 4:
                 if (STARTED_FLAG) {
-                    ROMUnit.requestWriteData(command[1], command[2], new DoubleByte(command[3], command[4]));
+                    ROMUnit.requestWriteData(command[1], command[2], new Word(command[3], command[4]));
                 }
                 break;
-            case 0x05:
+            case 5:
                 if(STARTED_FLAG){
-                    ScreenUnit.writePixel(command[1], command[2], new DoubleByte(command[3], command[4]));
+                    ScreenUnit.writePixel(command[1], command[2], new Word(command[3], command[4]));
                 }
                 break;
-            case 0x06:
+            case 6:
                 if(STARTED_FLAG){
                     ArithmeticLogicUnit.evaluate(command[1], command[2], command[3]);
                 }
                 break;
-            case 0x07: // NO OP
+            case 7: // NO OP
                 break;
-            case 0x08: // clear screen
+            case 8: // clear screen
                 if(STARTED_FLAG){
                     ScreenUnit.clearScreen();
                 }
                 break;
-            case 0x09: // dump pixel data
+            case 9: // dump pixel data
                 if(STARTED_FLAG){
-                    ScreenUnit.pixelDataDump(command[1], command[2], new DoubleByte(command[3], command[4]));
+                    ScreenUnit.pixelDataDump(command[1], command[2], new Word(command[3], command[4]));
                 }
                 break;
-            case 0x0A: // set protected memory
+            case 10: // set protected memory
                 if(STARTED_FLAG){
-                    ROMUnit.setProtectedMemory(command[1], command[2], new DoubleByte(command[3], command[4]));
+                    ROMUnit.setProtectedMemory(command[1], command[2], new Word(command[3], command[4]));
                 }
                 break;
-            case 0x0B: // read from PC
+            case 11: // read from PC
                 if(STARTED_FLAG){
                     eBF.eBFInterpreter.setPointerValue(ProgramCounterUnit.readData(command[1], command[2]));
                 }
                 break;
-            case 0x0C: // read from ALU
+            case 12: // read from ALU
                 if(STARTED_FLAG){
-                    eBF.eBFInterpreter.setPointerValue(ArithmeticLogicUnit.readData(command[1], command[2]));
+                    eBF.eBFInterpreter.setPointerValue(ArithmeticLogicUnit.readData());
                 }
                 break;
         }

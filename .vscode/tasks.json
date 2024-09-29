@@ -7,27 +7,26 @@
             "command": "javac",
             "args": [
                 "-d",
-                "eBF External Programming/bin/classFiles",
-                "./eBF External Programming/src/eBF/DoubleByte.java",
-                "./eBF External Programming/src/eBF/eBFInterpreter.java",
+                "eBF External Programming/bin/Tooling/classFiles",
+                "./eBF External Programming/src/Tooling/EmbeddedeBFCompiler.java",
                 "./eBF External Programming/src/eBF/UnrecognizedTokenException.java"
             ],
             "group": {
                 "kind": "build",
                 "isDefault": true
             },
-            "problemMatcher": ["$javac"],
-            "detail": "Compiles DoubleByte.java, eBFInterpreter.java, and UnrecognizedTokenException.java"
+            "problemMatcher": [],
+            "detail": "Compiles random bs"
         },
         {
-            "label": "Compile eBFInterpreter to .jar",
+            "label": "Compile random bs to .jar",
             "type": "shell",
             "command": "jar",
             "args": [
                 "cvf",
-                "eBFInterpreter.jar",
+                "EmbeddedeBFCompiler.jar",
                 "-C",
-                "eBF External Programming/bin",
+                "eBF External Programming/bin/Tooling",
                 "."
             ],
             "group": {

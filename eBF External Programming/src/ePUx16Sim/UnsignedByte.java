@@ -16,4 +16,17 @@ public class UnsignedByte {
 
     public byte getRawValue() { return rawValue; }
     public static UnsignedByte zero() { return new UnsignedByte(0); }
+
+    public static UnsignedByte[] toUnsignedByte(String[] s){
+        byte[] b = new byte[s.length];
+        for(int i = 0; i < s.length; i++){
+            b[i] = (byte) Integer.parseInt(s[i], 2);
+        }
+
+        UnsignedByte[] ub = new UnsignedByte[b.length];
+        for(int i = 0; i < b.length; i++){
+            ub[i] = new UnsignedByte(b[i]);
+        }
+        return ub;
+    }
 }

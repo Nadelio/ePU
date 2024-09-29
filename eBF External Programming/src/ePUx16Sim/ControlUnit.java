@@ -26,7 +26,7 @@ public class ControlUnit {
                     RAMUnit.writeData(command[1], command[2], new Word(command[3], command[4]));
                 }
                 break;
-            case 4:
+            case 4: // request write data to ROM
                 if (STARTED_FLAG) {
                     ROMUnit.requestWriteData(command[1], command[2], new Word(command[3], command[4]));
                 }
@@ -68,17 +68,24 @@ public class ControlUnit {
                     eBF.eBFInterpreter.setPointerValue(ArithmeticLogicUnit.readData());
                 }
                 break;
+            case 13:
+                if(STARTED_FLAG){ // request write data dump to ROM
+                    ROMUnit.requestWriteDataHeap(command[1], command[2], new Word(command[3], command[4]));
+                }
+                break;
         }
     }
 
     public static void shutdownProtocol(){
+        System.out.println("| Stopping computer |");
         // write all data to file
         try { ROMUnit.saveToFile(); } catch (IOException e) { e.printStackTrace(); }
         STARTED_FLAG = false;
         // add any other shutdown protocols here
     }
 
-    public static void startupProtocol(){
+    public static void startupProtocol() throws IOException{
+        System.out.println("| Starting computer |");
         // read all data from file
         ROMUnit.loadFromFile();
         ScreenUnit.intializeScreen();

@@ -7,37 +7,35 @@ public class ArithmeticLogicUnit {
     private static byte out;
 
     public static void evaluate(UnsignedByte op, UnsignedByte a, UnsignedByte b) {
-        byte opCode = op.getRawValue();
-        opCode -= (byte) 0x70;
-        switch(opCode){
-            case 0x00: // add
+        switch(op.value){
+            case 0: // add
                 out = (byte) (a.value + b.value);
                 break;
-            case 0x01: // sub
+            case 1: // sub
                 out = (byte) (a.value - b.value);
                 break;
-            case 0x02: // mul
+            case 2: // mul
                 out = (byte) (a.value * b.value);
                 break;
-            case 0x03: // div
+            case 3: // div
                 out = (byte) (a.value / b.value);
                 break;
-            case 0x04: // mod
+            case 4: // mod
                 out = (byte) (a.value % b.value);
                 break;
-            case 0x05: // and
+            case 5: // and
                 out = (byte) (a.value & b.value);
                 break;
-            case 0x06: // or
+            case 6: // or
                 out = (byte) (a.value | b.value);
                 break;
-            case 0x07: // xor
+            case 7: // xor
                 out = (byte) (a.value ^ b.value);
                 break;
-            case 0x08: // not
+            case 8: // not
                 out = (byte) ~a.value;
                 break;
-            default:
+            default: // flush
                 out = 0x00;
                 break;
         }

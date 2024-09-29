@@ -16,12 +16,12 @@ public class RAMUnit {
     public static void writeData(UnsignedByte x, UnsignedByte y, Word data) {
         int xAddr = x.value;
         int yAddr = y.value;
-        RAM[xAddr][yAddr] = data;
+        RAM[yAddr][xAddr] = data;
     }
 
     public static Word readData(UnsignedByte x, UnsignedByte y) {
         int xAddr = x.value;
         int yAddr = y.value;
-        return RAM[xAddr][yAddr];
+        return RAM[yAddr][xAddr];
     }
 }

@@ -38,6 +38,7 @@ public class ScreenUnit {
     }
 
     public static void writePixel(UnsignedByte x, UnsignedByte y, Word color) { // set a specific pixel to a specific color at location (x, y)
+        if(color == null){ color = Word.zero(); }
         Color c = ScreenUnit.getColor(color);
         screenImage.setRGB(x.value, y.value, c.getRGB());
         panel.repaint();
@@ -56,14 +57,15 @@ public class ScreenUnit {
      * 
      * @param x : x address of first piece area of pixels in screen
      * @param y : y address of first piece area of pixels in screen
-     * @param size : Size is half the actual size of the read data
+     * @param size : size of data dump
      */
     public static void pixelDataDump(UnsignedByte x, UnsignedByte y, Word size) { // reads in pixel data from RAM at (x, y) until size is met
         if(size.convertToInt() == 0){ return; }
         if(size.convertToInt() > 256){ return; }
         int i;
         for (i = 0; i < size.convertToInt(); i++) {
-            Word pixelData = RAMUnit.readData(new UnsignedByte(ramXMapAddress + i), new UnsignedByte(ramYMapAddress + i));
+            Word pixelData = RAMUnit.readData(new UnsignedByte(ramXMapAddress + i), new UnsignedByte(ramYMapAddress));
+            if(pixelData == null){ pixelData = Word.zero(); }
             ScreenUnit.writePixel(x, y, pixelData);
             x.value++;
             if (x.value == 256) {

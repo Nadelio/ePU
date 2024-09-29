@@ -71,6 +71,6 @@ public class Word {
     }
     
     public String toString() {
-        return Integer.toBinaryString(highByte.value) + "" + Integer.toBinaryString(lowByte.value) + " ";
+        return Integer.toBinaryString(highByte.value) + "" + Integer.toBinaryString(lowByte.value);
     }
 }

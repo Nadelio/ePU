@@ -269,7 +269,7 @@ public class eBFInterpreter {
         }
     }
 
-    private static UnsignedByte[] toUnsignedByte(String[] s){
+    public static UnsignedByte[] toUnsignedByte(String[] s){
         byte[] b = new byte[s.length];
         for(int i = 0; i < s.length; i++){
             b[i] = (byte) Integer.parseInt(s[i], 2);

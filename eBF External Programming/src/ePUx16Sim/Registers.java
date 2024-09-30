@@ -51,9 +51,9 @@ public class Registers {
         int size = 0;
         while(!((ROMUnit.readData(x, y).convertToInt()) == (new Word(UnsignedByte.zero(), new UnsignedByte(15)).convertToInt()))){
             if(ROMUnit.readData(x, y).convertToInt() != 0) {
-                System.out.println("ROM Data: " + ROMUnit.readData(x, y).convertToInt());
-                System.out.println("Size: " + size);
-                System.out.println("X: " + x.value + " Y: " + y.value + "\n");
+                System.out.println("| ROM Data: " + ROMUnit.readData(x, y).convertToInt() + " |");
+                System.out.println("| Size: " + size + " |");
+                System.out.println("| X: " + x.value + " Y: " + y.value + " |\n");
             }
             size++;
             x.value++;
@@ -67,6 +67,8 @@ public class Registers {
             }
             if((ROMUnit.readData(x, y).convertToInt()) == (new Word(UnsignedByte.zero(), new UnsignedByte(15)).convertToInt())){ break; }
         }
+        System.out.println("| Found Program Size |");
+        System.out.println("| Program Size: " + size + " |");
         return size;
     }
 

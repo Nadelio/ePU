@@ -276,7 +276,6 @@ public class eBFInterpreter {
         byte[] b = new byte[s.length];
         for(int i = 0; i < s.length; i++){
             if (!s[i].isEmpty()) {
-                System.out.println(s[i]);
                 b[i] = (byte) Integer.parseInt(s[i], 2);
             } else {
                 throw new NumberFormatException("Empty string at index " + i);

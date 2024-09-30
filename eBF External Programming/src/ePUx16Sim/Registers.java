@@ -46,15 +46,11 @@ public class Registers {
         eBF.eBFInterpreter.interpretEBIN(programFile);
     }
 
-    public static int findSize(UnsignedByte x, UnsignedByte y) {
+    //! Don't forget to compile to .jar
+    public static int findSize(UnsignedByte x, UnsignedByte y) { //! ISSUE WITH NOT DETECTING END OF PROGRAM
         System.out.println("| Finding Program Size |");
         int size = 0;
-        while(!((ROMUnit.readData(x, y).convertToInt()) == (new Word(UnsignedByte.zero(), new UnsignedByte(15)).convertToInt()))){
-            if(ROMUnit.readData(x, y).convertToInt() != 0) {
-                System.out.println("| ROM Data: " + ROMUnit.readData(x, y).convertToInt() + " |");
-                System.out.println("| Size: " + size + " |");
-                System.out.println("| X: " + x.value + " Y: " + y.value + " |\n");
-            }
+        while(!((ROMUnit.readData(x, y).convertToInt()) == (new Word(UnsignedByte.zero(), new UnsignedByte(15)).convertToInt()))){ //! HERE
             size++;
             x.value++;
             if(x.value == 256){
@@ -65,7 +61,7 @@ public class Registers {
                     return 0;
                 }
             }
-            if((ROMUnit.readData(x, y).convertToInt()) == (new Word(UnsignedByte.zero(), new UnsignedByte(15)).convertToInt())){ break; }
+            if((ROMUnit.readData(x, y).convertToInt()) == (new Word(UnsignedByte.zero(), new UnsignedByte(15)).convertToInt())){ break; } //! HERE
         }
         System.out.println("| Found Program Size |");
         System.out.println("| Program Size: " + size + " |");

@@ -112,6 +112,9 @@ public class ROMUnit {
         // read ROM data from file
         // read protected memory data from file
         // read empty memory data from file
+
+        System.out.println("| Loading ROM Data |");
+
         File raw = new File("ePUx16SimData/raw.rom");
         File protectedMem = new File("ePUx16SimData/protected.rom");
 

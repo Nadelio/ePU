@@ -71,6 +71,8 @@ public class Word {
     }
     
     public String toString() {
-        return Integer.toBinaryString(highByte.value) + "" + Integer.toBinaryString(lowByte.value);
+        String highByteStr = String.format("%8s", Integer.toBinaryString(highByte.value)).replace(' ', '0');
+        String lowByteStr = String.format("%8s", Integer.toBinaryString(lowByte.value)).replace(' ', '0');
+        return highByteStr + lowByteStr;
     }
 }

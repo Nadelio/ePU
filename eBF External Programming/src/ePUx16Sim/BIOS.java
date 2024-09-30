@@ -9,10 +9,11 @@ public class BIOS {
 
     public static void main(String [] args) throws Exception{
         UnsignedByte zero = UnsignedByte.zero();
-        UnsignedByte one = new UnsignedByte(1);
         UnsignedByte two = new UnsignedByte(2);
-        ControlUnit.commandUnit(new UnsignedByte[]{ one }); // start computer
+        UnsignedByte start = new UnsignedByte(1);
+        UnsignedByte runProg = new UnsignedByte(2);
+        ControlUnit.commandUnit(new UnsignedByte[]{ start }); // start computer
         System.out.println("| Loading OS |");
-        ControlUnit.commandUnit(new UnsignedByte[]{ two, zero, two }); // load and start OS ( 2 : { x, y } )
+        ControlUnit.commandUnit(new UnsignedByte[]{ runProg, zero, two }); // load and start OS ( 2 : { x, y } )
     }
 }

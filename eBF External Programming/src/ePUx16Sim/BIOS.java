@@ -11,9 +11,8 @@ public class BIOS {
         UnsignedByte zero = UnsignedByte.zero();
         UnsignedByte one = new UnsignedByte(1);
         UnsignedByte two = new UnsignedByte(2);
-        UnsignedByte nine = new UnsignedByte(9);
         ControlUnit.commandUnit(new UnsignedByte[]{ one }); // start computer
         System.out.println("| Loading OS |");
-        ControlUnit.commandUnit(new UnsignedByte[]{ two, two, zero, zero, nine }); // load and start OS ( 2 : { x, y } { size } )
+        ControlUnit.commandUnit(new UnsignedByte[]{ two, zero, two }); // load and start OS ( 2 : { x, y } )
     }
 }

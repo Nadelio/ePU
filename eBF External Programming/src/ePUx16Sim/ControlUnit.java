@@ -3,7 +3,6 @@ package ePUx16Sim;
 import java.io.IOException;
 
 import eBF.Word;
-import eBF.eBFInterpreter;
 
 public class ControlUnit {
     private static boolean STARTED_FLAG = false;

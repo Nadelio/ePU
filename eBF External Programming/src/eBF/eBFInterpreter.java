@@ -136,7 +136,7 @@ public class eBFInterpreter {
     public static void interpretEBIN(File eBinaryFile) throws Exception{
         Scanner sc = new Scanner(eBinaryFile);
         String eBinCode = "";
-        while(sc.hasNextLine()){ eBinCode += sc.nextLine() + " "; }
+        while(sc.hasNextLine()){ eBinCode += sc.nextLine(); }
         sc.close();
 
         int c = 0;
@@ -275,8 +275,12 @@ public class eBFInterpreter {
     public static UnsignedByte[] toUnsignedByte(String[] s){
         byte[] b = new byte[s.length];
         for(int i = 0; i < s.length; i++){
-            System.out.println(s[i]);
-            b[i] = (byte) Integer.parseInt(s[i], 2);
+            if (!s[i].isEmpty()) {
+                System.out.println(s[i]);
+                b[i] = (byte) Integer.parseInt(s[i], 2);
+            } else {
+                throw new NumberFormatException("Empty string at index " + i);
+            }
         }
 
         UnsignedByte[] ub = new UnsignedByte[b.length];

@@ -14,7 +14,11 @@ public class WriteToROM {
     public static Word[][] ROM = new Word[256][256];
 
     public static void main(String[] args) {
-
+        for(int i = 0; i < 256; i++){
+            for(int j = 0; j < 256; j++){
+                ROM[i][j] = Word.zero();
+            }
+        }
         
         // write ROM data to file
         FileWriter fw;

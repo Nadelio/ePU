@@ -21,7 +21,7 @@ public class Registers {
     }
 
     public static void startProgram(UnsignedByte x, UnsignedByte y, Word size) throws Exception {
-        if(size.isZero()){ return; }
+        if(size.isZero()){ System.out.println("| Program Size is Zero, Returning |"); return; }
         
         File programFile = new File("program.ebin");
         FileWriter fw = new FileWriter(programFile);
@@ -37,7 +37,9 @@ public class Registers {
 
         fw.close();
 
+        System.out.println("| Initializing Stack |");
         eBF.eBFInterpreter.initializeStack();
+        System.out.println("| Program Running |");
         eBF.eBFInterpreter.interpretEBIN(programFile);
     }
 

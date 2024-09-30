@@ -3,6 +3,7 @@ package ePUx16Sim;
 import java.io.IOException;
 
 import eBF.Word;
+import eBF.eBFInterpreter;
 
 public class ControlUnit {
     private static boolean STARTED_FLAG = false;
@@ -16,12 +17,12 @@ public class ControlUnit {
             case 1: // start computer
                 startupProtocol();
                 break;
-            case 2:
+            case 2: // load and start program
                 if(STARTED_FLAG){
                     ProgramCounterUnit.requestStartProgram(command[1], command[2], Word.convertToWord(Registers.findSize(command[1], command[2])));
                 }
                 break;
-            case 3:
+            case 3: // write data to RAM
                 if(STARTED_FLAG){
                     RAMUnit.writeData(command[1], command[2], new Word(command[3], command[4]));
                 }
@@ -31,12 +32,12 @@ public class ControlUnit {
                     ROMUnit.requestWriteData(command[1], command[2], new Word(command[3], command[4]));
                 }
                 break;
-            case 5:
+            case 5: // write pixel to screen
                 if(STARTED_FLAG){
                     ScreenUnit.writePixel(command[1], command[2], new Word(command[3], command[4]));
                 }
                 break;
-            case 6:
+            case 6: // math operations
                 if(STARTED_FLAG){
                     ArithmeticLogicUnit.evaluate(command[1], command[2], command[3]);
                 }
@@ -71,6 +72,11 @@ public class ControlUnit {
             case 13:
                 if(STARTED_FLAG){ // request write data dump to ROM
                     ROMUnit.requestWriteDataHeap(command[1], command[2], new Word(command[3], command[4]));
+                }
+                break;
+            case 14:
+                if(STARTED_FLAG){ // write to terminal
+                    System.out.println((char) (eBF.eBFInterpreter.getPointerValue() + 32));
                 }
                 break;
         }

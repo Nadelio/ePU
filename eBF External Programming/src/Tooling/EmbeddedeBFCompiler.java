@@ -139,7 +139,7 @@ public class EmbeddedeBFCompiler {
     public static boolean DEBUG_FLAG = false;
     public static boolean WRITE_FLAG = false;
 
-    public static void main(String[] args) throws java.io.IOException{
+    public static void main(String[] args){
 
         String eBFCode = "";
 
@@ -191,9 +191,13 @@ public class EmbeddedeBFCompiler {
                 File inputFile = new File(args[1]);
                 File outputFile = new File(inputFile.getName().substring(0, inputFile.getName().length() - 4) + ".ebin");
                 System.out.println("Writing eBin code to " + outputFile.getName());
-                java.io.FileWriter fw = new java.io.FileWriter(outputFile);
-                fw.write(eBinCode);
-                fw.close();
+                
+                try{
+                    java.io.FileWriter fw = new java.io.FileWriter(outputFile);
+                    fw.write(eBinCode);
+                    fw.close();
+                } catch(java.io.IOException e){ e.printStackTrace(); }
+
                 System.out.println("Completed writting eBin code to " + outputFile.getName());
             }
 

@@ -195,8 +195,11 @@ public class eBFInterpreter {
                     pointerValue = RAMUnit.RAM[pointerX][pointerY].convertToInt();
                     break;
                 case 9: // read from user
+                    System.out.print("Enter a character: ");
                     RAMUnit.RAM[pointerX][pointerY].setHighByte(new UnsignedByte(System.in.read()));
+                    System.out.print("\nEnter another character: ");
                     RAMUnit.RAM[pointerX][pointerY].setLowByte(new UnsignedByte(System.in.read()));
+                    System.out.println();
                     break;
                 case 10: // push
                     incrementStackPointer();
@@ -272,6 +275,7 @@ public class eBFInterpreter {
     public static UnsignedByte[] toUnsignedByte(String[] s){
         byte[] b = new byte[s.length];
         for(int i = 0; i < s.length; i++){
+            System.out.println(s[i]);
             b[i] = (byte) Integer.parseInt(s[i], 2);
         }
 
@@ -365,4 +369,5 @@ public class eBFInterpreter {
     }
 
     public static void setPointerValue(Word value){ pointerValue = value.convertToInt(); }
+    public static int getPointerValue(){ return pointerValue; }
 }

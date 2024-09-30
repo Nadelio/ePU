@@ -5,7 +5,9 @@ import eBF.Word;
 public class ProgramCounterUnit {
 
     public static void requestStartProgram(UnsignedByte x, UnsignedByte y, Word size) throws Exception {
+        System.out.println("| Loading Program |");
         Registers.readInProgram(x, y, size);
+        System.out.println("| Starting Program |");
         Registers.startProgram(x, y, size);
     }
 

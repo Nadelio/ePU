@@ -8,25 +8,27 @@
             "args": [
                 "-d",
                 "eBF External Programming/bin/Tooling/classFiles",
-                "./eBF External Programming/src/Tooling/EmbeddedeBFCompiler.java",
-                "./eBF External Programming/src/eBF/UnrecognizedTokenException.java"
+                "./eBF External Programming/src/Tooling/WriteToROM.java",
+                "./eBF External Programming/src/eBF/Word.java",
+                "./eBF External Programming/src/ePUx16Sim/UnsignedByte.java"
             ],
             "group": {
                 "kind": "build",
                 "isDefault": true
             },
             "problemMatcher": [],
-            "detail": "Compiles random bs"
+            "detail": "Compiles WriteToROM and dependencies"
         },
         {
-            "label": "Compile random bs to .jar",
+            "label": "Compile WriteToROM to .jar",
             "type": "shell",
             "command": "jar",
             "args": [
-                "cvf",
-                "EmbeddedeBFCompiler.jar",
+                "cvfm", // 'm' option to include manifest file
+                "WriteToROM.jar",
+                "manifest.txt", // path to the manifest file
                 "-C",
-                "eBF External Programming/bin/Tooling",
+                "eBF External Programming/bin/Tooling/classFiles", // Ensure this points to the correct directory
                 "."
             ],
             "group": {

@@ -19,7 +19,7 @@ public class Word {
     public int getSize(){ return size; }
     public static Word zero(){ return new Word(UnsignedByte.zero(), UnsignedByte.zero()); }
 
-    public boolean isZero(){ return (highByte.getRawValue() == 0) && (lowByte.getRawValue() == 0); }
+    public boolean isZero(){ return (Word.zero().getHighByte() == this.highByte) && (Word.zero().getLowByte() == this.lowByte); }
 
     public void setHighByte(UnsignedByte highByte){ this.highByte = highByte; }
     public void setLowByte(UnsignedByte lowByte){ this.lowByte = lowByte; }

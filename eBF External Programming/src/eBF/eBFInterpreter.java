@@ -11,7 +11,7 @@ public class eBFInterpreter {
     private static DoubleByte[] stack = new DoubleByte[256];
     private static int stackPointer = 0;
 
-    // Tape OPERATIONS
+    // TAPE OPERATIONS
     private static int pointerX = 0;
     private static int pointerY = 0;
     private static int pointerValue = 0;
@@ -100,7 +100,6 @@ public class eBFInterpreter {
                     break;
                 case "DPND":
                     if(eBFTokens[i+1].contains(".")){ dependencies.put(eBFTokens[i+2], new File(eBFTokens[i+1])); i += 2; }
-                    // else if(inSimMode()){ ePUx16Sim.loadDependency(eBFTokens[i+1], eBFTokens[i+2], eBFTokens[i+3]); i += 3; }
                     break;
                 case "%":
                     if(dependencies.containsKey(eBFTokens[i+1])){
@@ -114,7 +113,6 @@ public class eBFInterpreter {
                             System.out.println("Error: Invalid Dependency File Type");
                         }
                     }
-                    // else if(inSimMode()){ ePUx16Sim.runDependency(eBFTokens[i+1]); i++;}
                     break;
                 case "'": // read from Tape
                     pointerValue = Tape[pointerX][pointerY].convertToInt();
@@ -286,7 +284,6 @@ public class eBFInterpreter {
                 }
             } catch(Exception e){ e.printStackTrace(); }
         }
-        simMode = false;
     }
 
     private static void initializeTape(){

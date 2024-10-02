@@ -1,7 +1,5 @@
 package ePUx16Sim;
 
-import eBF.Word;
-
 public class ArithmeticLogicUnit {
 
     private static byte out;

@@ -1,7 +1,5 @@
 package ePUx16Sim;
 
-import eBF.Word;
-
 public class ProgramCounterUnit {
 
     public static void requestStartProgram(UnsignedByte x, UnsignedByte y, Word size) throws Exception {

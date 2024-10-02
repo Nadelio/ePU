@@ -2,6 +2,8 @@ package eBF;
 
 import java.io.File;
 
+import ePUx16Sim.UnrecognizedTokenException;
+
 public class eBFCompiler{
     // this compiles eBF tokens into eBin
 

@@ -2,8 +2,6 @@ package ePUx16Sim;
 
 import java.io.IOException;
 
-import eBF.Word;
-
 public class ControlUnit {
     private static boolean STARTED_FLAG = false;
 

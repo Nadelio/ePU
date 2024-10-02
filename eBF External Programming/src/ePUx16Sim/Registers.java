@@ -1,6 +1,5 @@
 package ePUx16Sim;
 
-import eBF.Word;
 import java.io.File;
 import java.io.FileWriter;
 
@@ -41,9 +40,9 @@ public class Registers {
         System.out.println("| Program File Size: " + programFile.length() + " |");
 
         System.out.println("| Initializing Stack |");
-        eBF.EmbeddedeBFInterpreter.initializeStack();
+        ePUx16Sim.EmbeddedeBFInterpreter.initializeStack();
         System.out.println("| Program Running |");
-        eBF.EmbeddedeBFInterpreter.interpretEBIN(programFile);
+        ePUx16Sim.EmbeddedeBFInterpreter.interpretEBIN(programFile);
     }
 
     //! Don't forget to compile to .jar // unable to compile/run on laptop, need to compile/run on desktop

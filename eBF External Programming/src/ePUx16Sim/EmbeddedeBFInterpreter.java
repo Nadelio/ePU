@@ -1,12 +1,7 @@
-package eBF;
+package ePUx16Sim;
+
 import java.io.File;
 import java.util.Scanner;
-
-import ePUx16Sim.ControlUnit;
-import ePUx16Sim.RAMUnit;
-import ePUx16Sim.Registers;
-import ePUx16Sim.UnsignedByte;
-
 import java.util.HashMap;
 
 public class EmbeddedeBFInterpreter {

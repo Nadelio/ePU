@@ -3,19 +3,22 @@ package eBF;
 import java.io.File;
 import java.util.Scanner;
 
+import ePUx16Sim.UnrecognizedTokenException;
+import ePUx16Sim.Word;
+
 import java.util.HashMap;
 
 public class eBFInterpreter {
 
     // STACK OPERATIONS
-    private static DoubleByte[] stack = new DoubleByte[256];
+    private static Word[] stack = new Word[256];
     private static int stackPointer = 0;
 
     // TAPE OPERATIONS
     private static int pointerX = 0;
     private static int pointerY = 0;
     private static int pointerValue = 0;
-    private static DoubleByte[][] Tape = new DoubleByte[256][256];
+    private static Word[][] Tape = new Word[256][256];
     private static final int maxPointerValue = (int) Math.pow(2, 8) - 1;
     
     // MISC VARS
@@ -79,7 +82,7 @@ public class eBFInterpreter {
                     }
                     break;
                 case ",":
-                    Tape[pointerX][pointerY] = DoubleByte.convertToDoubleByte(pointerValue);
+                    Tape[pointerX][pointerY] = Word.convertToWord(pointerValue);
                     break;
                 case "=": // write to terminal
                     System.out.print((char) (Tape[pointerX][pointerY].convertToInt() + 32));
@@ -90,12 +93,12 @@ public class eBFInterpreter {
                     break;
                 case ">>":
                     incrementStackPointer();
-                    stack[stackPointer] = DoubleByte.convertToDoubleByte(pointerValue);
+                    stack[stackPointer] = Word.convertToWord(pointerValue);
                     pointerValue = 0;
                     break;
                 case "<<":
                     pointerValue = stack[stackPointer].convertToInt();
-                    stack[stackPointer] = DoubleByte.convertToDoubleByte(0);
+                    stack[stackPointer] = Word.convertToWord(0);
                     decrementStackPointer();
                     break;
                 case "DPND":
@@ -193,7 +196,7 @@ public class eBFInterpreter {
                     }
                     break;
                 case "0000000000000111":
-                    Tape[pointerX][pointerY] = DoubleByte.convertToDoubleByte(pointerValue);
+                    Tape[pointerX][pointerY] = Word.convertToWord(pointerValue);
                     break;
                 case "0000000000001101": // read from Tape
                     pointerValue = Tape[pointerX][pointerY].convertToInt();
@@ -204,12 +207,12 @@ public class eBFInterpreter {
                     break;
                 case "0000000000001001":
                     incrementStackPointer();
-                    stack[stackPointer] = DoubleByte.convertToDoubleByte(pointerValue);
+                    stack[stackPointer] = Word.convertToWord(pointerValue);
                     pointerValue = 0;
                     break;
                 case "0000000000001010":
                     pointerValue = stack[stackPointer].convertToInt();
-                    stack[stackPointer] = DoubleByte.convertToDoubleByte(0);
+                    stack[stackPointer] = Word.convertToWord(0);
                     decrementStackPointer();
                     break;
                 case "0000000000001011":
@@ -289,14 +292,14 @@ public class eBFInterpreter {
     private static void initializeTape(){
         for(int i = 0; i < 255; i++){
             for(int j = 0; j < 255; j++){
-                Tape[i][j] = new DoubleByte((byte) 0x0000, (byte) 0x0000);
+                Tape[i][j] = new Word((byte) 0x0000, (byte) 0x0000);
             }
         }
     }
 
     private static void initializeStack(){
         for(int i = 0; i < stack.length; i++){
-            stack[i] = new DoubleByte((byte) 0x0000, (byte) 0x0000);
+            stack[i] = new Word((byte) 0x0000, (byte) 0x0000);
         }
     }
 

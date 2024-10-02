@@ -7,8 +7,6 @@ import java.awt.Graphics;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import eBF.Word;
-
 import java.awt.image.BufferedImage;
 
 public class ScreenUnit {

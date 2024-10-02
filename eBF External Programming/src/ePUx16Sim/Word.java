@@ -1,6 +1,4 @@
-package eBF;
-
-import ePUx16Sim.UnsignedByte;
+package ePUx16Sim;
 
 public class Word {
     private UnsignedByte highByte;

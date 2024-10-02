@@ -1,7 +1,5 @@
 package ePUx16Sim;
 
-import eBF.Word;
-
 public class RAMUnit {
     public static Word[][] RAM = new Word[256][256];
 

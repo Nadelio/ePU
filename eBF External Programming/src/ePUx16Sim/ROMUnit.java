@@ -6,8 +6,6 @@ import java.nio.file.Paths;
 import java.io.IOException;
 import java.nio.file.Files;
 
-import eBF.Word;
-
 public class ROMUnit {
 
     private static final int ramXMapAddress = 0;

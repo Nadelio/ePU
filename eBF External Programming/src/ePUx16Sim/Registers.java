@@ -41,12 +41,12 @@ public class Registers {
         System.out.println("| Program File Size: " + programFile.length() + " |");
 
         System.out.println("| Initializing Stack |");
-        eBF.eBFInterpreter.initializeStack();
+        eBF.EmbeddedeBFInterpreter.initializeStack();
         System.out.println("| Program Running |");
-        eBF.eBFInterpreter.interpretEBIN(programFile);
+        eBF.EmbeddedeBFInterpreter.interpretEBIN(programFile);
     }
 
-    //! Don't forget to compile to .jar
+    //! Don't forget to compile to .jar // unable to compile/run on laptop, need to compile/run on desktop
     public static int findSize(UnsignedByte x, UnsignedByte y) { //! ISSUE WITH NOT DETECTING END OF PROGRAM
         System.out.println("| Finding Program Size |");
         int size = 0;

@@ -5,11 +5,11 @@ import java.io.File;
 public class eBFCompiler{
     // this compiles eBF tokens into eBin
 
-    private static final String[] eBFTokens = {"+", "-", ">", "<", "[", "]", ",", ".", ">>", "<<", "DPND", "%", "$", "=", "'", "END"};
-    private static final String[] eBinTokens = {"00000001", "00000010", "00000011", "00000100", "00000101", "00000110", "00000111", "00001000", "00001001", "00001010", "00001011", "00001100", "00001101", "00001110", "00001111"};
-                                              // 0       1       2       3       4       5       6       7       8       9       10      11      12      13      14
-    private static final String[] tokenNames = {"{INCREMENT}", "{DECREMENT}", "{POINTER_INCREMENT}", "{POINTER_DECREMENT}", "{LOOP_START}", "{LOOP_END}", "{WRITE_TO_RAM}", "{INPUT}", "{PUSH_STACK}", "{POP_STACK}", "{DEPENDENCY}", "{DEPENDENCY_VALUE}", "{DEPENDENCY_X_ADDRESS}", "{DEPENDENCY_Y_ADDRESS}", "{DEPENDENCY_ALIAS}", "{DEPENDENCY_CALL}", "{SYSTEM_CALL}", "{SYSTEM_CALL_VALUE}", "{END_PROGRAM}", "{WRITE_TO_TERMINAL}", "{READ_FROM_RAM}"};
-                                              // 0,             1,             2,                     3,                     4,              5,            6,                7,         8,              9,             10,             11,                   12,                       13,                       14,                   15,                  16,              17,                    18,              19,                    20
+    private static final String[] eBFTokens = {"+", "-", ">", "<", "[", "]", ",", ".", ">>", "<<", "DPND", "%", "$", "=", "'", "#", "@", "END"};
+    private static final String[] eBinTokens = {"0000000000000001", "0000000000000010", "0000000000000011", "0000000000000100", "0000000000000101", "0000000000000110", "0000000000000111", "0000000000001000", "0000000000001001", "0000000000001010", "0000000000001011", "0000000000001100", "0000000000001101", "0000000000001110", "0000000000001111", "0000000000010000", "0000000000010001"};
+                                              // 0                   1                   2                   3                   4                   5                   6                   7                   8                   9                   10                  11                  12                  13                  14                  15                  16
+    private static final String[] tokenNames = {"{INCREMENT}", "{DECREMENT}", "{POINTER_INCREMENT}", "{POINTER_DECREMENT}", "{LOOP_START}", "{LOOP_END}", "{WRITE_TO_RAM}", "{INPUT}", "{PUSH_STACK}", "{POP_STACK}", "{DEPENDENCY}", "{DEPENDENCY_VALUE}", "{DEPENDENCY_X_ADDRESS}", "{DEPENDENCY_Y_ADDRESS}", "{DEPENDENCY_ALIAS}", "{DEPENDENCY_CALL}", "{SYSTEM_CALL}", "{SYSTEM_CALL_VALUE}", "{END_PROGRAM}", "{WRITE_TO_TERMINAL}", "{READ_FROM_RAM}", "{CREATE_LABEL}", "{JUMP_TO_LABEL}", "{LABEL_ALIAS}"};
+                                              // 0,             1,             2,                     3,                     4,              5,            6,                7,         8,              9,             10,             11,                   12,                       13,                       14,                   15,                  16,              17,                    18,              19,                    20                 21                22                 23
     private static String eBFtoString = "";
     private static String processedeBFCode = "";
 
@@ -114,6 +114,18 @@ public class eBFCompiler{
                             eBFtoString += tokenNames[16] + " " + tokenNames[17] + " ";
                             processedeBFCode += tokens[j] + " " + tokens[j+1] + " " + tokens[j+2] + " " + tokens[j+3] + " " + tokens[j+4] + " " + tokens[j+5] + " ";
                             j += 4;
+                            break;
+                        case "#":
+                            eBinCode += eBinTokens[15] + " " + tokens[j+1] + " ";
+                            eBFtoString += tokenNames[21] + " " + tokenNames[23] + " ";
+                            processedeBFCode += tokens[j] + " " + tokens[j+1] + " ";
+                            j++;
+                            break;
+                        case "@":
+                            eBinCode += eBinTokens[16] + " " + tokens[j+1] + " ";
+                            eBFtoString += tokenNames[22] + " " + tokenNames[23] + " ";
+                            processedeBFCode += tokens[j] + " " + tokens[j+1] + " ";
+                            j++;
                             break;
                         case "=":
                             eBinCode += eBinTokens[13] + " ";

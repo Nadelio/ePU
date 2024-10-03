@@ -6,7 +6,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import eBF.Word;
+import ePUx16Sim.Word;
 import ePUx16Sim.UnsignedByte;
 
 public class WriteToROM {

@@ -303,8 +303,8 @@ public class eBFInterpreter {
     }
 
     private static void initializeTape(){
-        for(int i = 0; i < 255; i++){
-            for(int j = 0; j < 255; j++){
+        for(int i = 0; i < 256; i++){
+            for(int j = 0; j < 256; j++){
                 Tape[i][j] = Word.zero();
             }
         }
@@ -322,24 +322,44 @@ public class eBFInterpreter {
             System.out.println("Token: " + tokenNumber + " ( " + token + " )");
 
             // Tape
-            for(int i = 0; i < Tape.length; i++){
-                for(int j = 0; j < Tape[i].length; j++){
-                    System.out.print("[" + Tape[i][j].convertToInt() + "]");
-                }
+            if(pointerX == 0) {
+                System.out.print("{" + Tape[pointerX][pointerY].convertToInt() + "}");
+                System.out.print("[" + Tape[pointerX + 1][pointerY].convertToInt() + "]");
+                System.out.print("[" + Tape[pointerX + 2][pointerY].convertToInt() + "]");
+                System.out.print("[" + Tape[pointerX + 3][pointerY].convertToInt() + "]");
+                System.out.println("[" + Tape[pointerX + 4][pointerY].convertToInt() + "]");
+            } else if(pointerX == 1) {
+                System.out.print("[" + Tape[pointerX - 1][pointerY].convertToInt() + "]");
+                System.out.print("{" + Tape[pointerX][pointerY].convertToInt() + "}");
+                System.out.print("[" + Tape[pointerX + 1][pointerY].convertToInt() + "]");
+                System.out.print("[" + Tape[pointerX + 2][pointerY].convertToInt() + "]");
+                System.out.println("[" + Tape[pointerX + 3][pointerY].convertToInt() + "]");
+            } else if(pointerX == 255) {
+                System.out.print("[" + Tape[pointerX - 4][pointerY].convertToInt() + "]");
+                System.out.print("[" + Tape[pointerX - 3][pointerY].convertToInt() + "]");
+                System.out.print("[" + Tape[pointerX - 2][pointerY].convertToInt() + "]");
+                System.out.print("[" + Tape[pointerX - 1][pointerY].convertToInt() + "]");
+                System.out.println("{" + Tape[pointerX][pointerY].convertToInt() + "}");
+            } else if(pointerX == 254) { 
+                System.out.print("[" + Tape[pointerX - 1][pointerY].convertToInt() + "]");
+                System.out.print("[" + Tape[pointerX - 2][pointerY].convertToInt() + "]");
+                System.out.print("[" + Tape[pointerX - 3][pointerY].convertToInt() + "]");
+                System.out.print("{" + Tape[pointerX][pointerY].convertToInt() + "}");
+                System.out.println("[" + Tape[pointerX + 1][pointerY].convertToInt() + "]");
+            } else if(pointerX >= 2 && pointerX <= 253){
+                System.out.print("[" + Tape[pointerX - 2][pointerY].convertToInt() + "]");
+                System.out.print("[" + Tape[pointerX - 1][pointerY].convertToInt() + "]");
+                System.out.print("{" + Tape[pointerX][pointerY].convertToInt() + "}");
+                System.out.print("[" + Tape[pointerX + 1][pointerY].convertToInt() + "]");
+                System.out.println("[" + Tape[pointerX + 2][pointerY].convertToInt() + "]");
             }
-            System.out.println();
-            
-            // Tape pointer
-            int totalPointerPosition = (pointerX * 256) + pointerY;
-            for(int i = 1; i < totalPointerPosition; i++){
-                System.out.print(" ");
-            }
-            System.out.println("*");
 
             // Stack
             System.out.print("[ ");
             for(int i = 0; i < stack.length; i++){
-                System.out.print(stack[i].convertToInt() + " ");
+                if(stack[i].convertToInt() != 0){
+                    System.out.print(stack[i].convertToInt() + " ");
+                }
             }
             System.out.println(" ]");
 
@@ -351,10 +371,11 @@ public class eBFInterpreter {
             for(String key : labels.keySet()){
                 int x = labels.get(key)[0];
                 int y = labels.get(key)[1];
-                int labelPosition = (x * 256) + y;
-                System.out.print(key + "[" + labelPosition + "] ");
+                int labelPosition = (y * 256) + x;
+                System.out.print(key + "[" + labelPosition + "]: " + Tape[x][y].convertToInt() + " ");
             }
             System.out.println("}");
+            System.out.println();
         }
     }
 

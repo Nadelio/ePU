@@ -37,7 +37,7 @@
 - Pointer value: The value stored with the pointer, interacted with via the increment and decrement instructions (`+`/`-`)
   - `PV = 0`
 - Pointer position: The position in the Tape that the pointer is pointing at, interacted with via the increment and decrement pointer instructions (`>`/`<`)
-  - represented as a `*` under a cell in the state diagram
+  - represented as `{ }` around a cell in the state diagram
 - `word`: 16-bit unsigned integer
 - Label: the name of a saved Tape position
   - `foo[0]: 0`
@@ -45,8 +45,7 @@
 A *state diagram* is a diagram that shows a representation of the current state of an eBF program:
 ```
 // Beginning state of all eBF programs
-[0][0][0][0]
- *
+{0}[0][0][0]
 [ 0, 0 ]
 PV = 0
 Labels: {  }

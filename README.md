@@ -8,7 +8,7 @@
 - This project was made as a fun experiment. It is inspired by the various iterations of Excel Computers seen on Youtube
 ### Features
 - The features of the ePUx16 Architecture are:
-   - full eBF language support with 15 different symbols tailored around the development of low-level systems, including operating systems
+   - full eBF language support with 20+ different symbols tailored around the development of low-level systems, including operating systems
    - Excel's Lambda as metacode
    - 16-bit central processor, RAM chip, ROM chip, and ALU chip
    - User input
@@ -23,3 +23,5 @@
     - A VSCode Extension with syntax highlighting for eBF
     - A standard library built for use in the independently functioning eBF language
     - Several miscellanous files from the development process, including diagrams, eBF/eBin keys, and full ePUx16 checklists
+### Credits
+- Nadelio : Creator, Primary Maintainer

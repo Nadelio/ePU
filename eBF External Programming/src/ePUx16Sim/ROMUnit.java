@@ -155,7 +155,7 @@ public class ROMUnit {
     }
 
     public static Word convertToWord(String data){
-        UnsignedByte[] bytes = eBF.eBFInterpreter.toUnsignedByte(new String[]{ data.substring(0, 8), data.substring(8) });
+        UnsignedByte[] bytes = EmbeddedeBFInterpreter.toUnsignedByte(new String[]{ data.substring(0, 8), data.substring(8) });
         return new Word(bytes[0], bytes[1]);
     }
 }

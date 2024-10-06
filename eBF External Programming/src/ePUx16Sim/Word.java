@@ -1,7 +1,5 @@
 package ePUx16Sim;
 
-import ePUx16Sim.UnsignedByte;
-
 public class Word {
     private UnsignedByte highByte;
     private UnsignedByte lowByte;

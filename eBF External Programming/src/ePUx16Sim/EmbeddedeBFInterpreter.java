@@ -159,7 +159,7 @@ public class EmbeddedeBFInterpreter {
 
         UnsignedByte[] ub = new UnsignedByte[b.length];
         for(int i = 0; i < b.length; i++){
-            if(byte == -1){
+            if(b[i] == -1){
                 ub[i] = new UnsignedByte(255);
             } else {
                 ub[i] = new UnsignedByte(b[i]);

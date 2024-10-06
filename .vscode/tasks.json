@@ -47,7 +47,8 @@
                 "eBF External Programming/bin/eBFInterpreter/classFiles",
                 "./eBF External Programming/src/eBF/eBFInterpreter.java",
                 "./eBF External Programming/src/ePUx16Sim/UnrecognizedTokenException.java",
-                "./eBF External Programming/src/ePUx16Sim/Word.java"
+                "./eBF External Programming/src/ePUx16Sim/Word.java",
+                "./eBF External Programming/src/ePUx16Sim/UnsignedByte.java"
             ],
             "group": {
                 "kind": "build",
@@ -63,7 +64,19 @@
             "args": [
                 "-d",
                 "eBF External Programming/bin/ePUx16/classFiles",
-                "./eBF External Programming/src/ePUx16Sim/*.java"
+                "./eBF External Programming/src/ePUx16Sim/ArithmeticLogicUnit.java",
+                "./eBF External Programming/src/ePUx16Sim/BIOS.java",
+                "./eBF External Programming/src/ePUx16Sim/ControlUnit.java",
+                "./eBF External Programming/src/ePUx16Sim/EmbeddedeBFInterpreter.java",
+                "./eBF External Programming/src/ePUx16Sim/ProgramCounterUnit.java",
+                "./eBF External Programming/src/ePUx16Sim/RAMUnit.java",
+                "./eBF External Programming/src/ePUx16Sim/Registers.java",
+                "./eBF External Programming/src/ePUx16Sim/ROMUnit.java",
+                "./eBF External Programming/src/ePUx16Sim/ScreenUnit.java",
+                "./eBF External Programming/src/ePUx16Sim/UnrecognizedTokenException.java",
+                "./eBF External Programming/src/ePUx16Sim/UnsignedByte.java",
+                "./eBF External Programming/src/ePUx16Sim/Word.java",
+
             ],
             "group": {
                 "kind": "build",

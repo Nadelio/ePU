@@ -5,6 +5,7 @@ import java.util.Scanner;
 
 import ePUx16Sim.UnrecognizedTokenException;
 import ePUx16Sim.Word;
+import ePUx16Sim.UnsignedByte;
 
 import java.util.HashMap;
 
@@ -88,8 +89,8 @@ public class eBFInterpreter {
                     System.out.print((char) (Tape[pointerX][pointerY].convertToInt() + 32));
                     break;
                 case ".":
-                    Tape[pointerX][pointerY].setHighByte((byte) System.in.read());
-                    Tape[pointerX][pointerY].setLowByte((byte) System.in.read());
+                    Tape[pointerX][pointerY].setHighByte(new UnsignedByte((byte) System.in.read()));
+                    Tape[pointerX][pointerY].setLowByte(new UnsignedByte((byte) System.in.read()));
                     break;
                 case ">>":
                     incrementStackPointer();
@@ -202,8 +203,8 @@ public class eBFInterpreter {
                     pointerValue = Tape[pointerX][pointerY].convertToInt();
                     break;
                 case "0000000000001000":
-                    Tape[pointerX][pointerY].setHighByte((byte) System.in.read());
-                    Tape[pointerX][pointerY].setLowByte((byte) System.in.read());
+                    Tape[pointerX][pointerY].setHighByte(new UnsignedByte((byte) System.in.read()));
+                    Tape[pointerX][pointerY].setLowByte(new UnsignedByte((byte) System.in.read()));
                     break;
                 case "0000000000001001":
                     incrementStackPointer();
@@ -292,14 +293,14 @@ public class eBFInterpreter {
     private static void initializeTape(){
         for(int i = 0; i < 255; i++){
             for(int j = 0; j < 255; j++){
-                Tape[i][j] = new Word((byte) 0x0000, (byte) 0x0000);
+                Tape[i][j] = Word.zero();
             }
         }
     }
 
     private static void initializeStack(){
         for(int i = 0; i < stack.length; i++){
-            stack[i] = new Word((byte) 0x0000, (byte) 0x0000);
+            stack[i] = Word.zero();
         }
     }
 

@@ -58,12 +58,12 @@ public class ControlUnit {
                 break;
             case 11: // read from PC
                 if(STARTED_FLAG){
-                    eBF.eBFInterpreter.setPointerValue(ProgramCounterUnit.readData(command[1], command[2]));
+                    EmbeddedeBFInterpreter.setPointerValue(ProgramCounterUnit.readData(command[1], command[2]));
                 }
                 break;
             case 12: // read from ALU
                 if(STARTED_FLAG){
-                    eBF.eBFInterpreter.setPointerValue(ArithmeticLogicUnit.readData());
+                    EmbeddedeBFInterpreter.setPointerValue(ArithmeticLogicUnit.readData());
                 }
                 break;
             case 13:
@@ -73,7 +73,7 @@ public class ControlUnit {
                 break;
             case 14:
                 if(STARTED_FLAG){ // write to terminal
-                    System.out.println((char) (eBF.eBFInterpreter.getPointerValue() + 32));
+                    System.out.println((char) (EmbeddedeBFInterpreter.getPointerValue() + 32));
                 }
                 break;
         }

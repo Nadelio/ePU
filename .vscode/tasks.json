@@ -29,7 +29,9 @@
                 "-d",
                 "eBF External Programming/bin/eBFCompiler/classFiles",
                 "./eBF External Programming/src/eBF/eBFCompiler.java",
-                "./eBF External Programming/src/ePUx16Sim/UnrecognizedTokenException.java"
+                "./eBF External Programming/src/ePUx16Sim/UnrecognizedTokenException.java",
+                "./eBF External Programming/src/ePUx16Sim/Word.java",
+                "./eBF External Programming/src/ePUx16Sim/UnsignedByte.java"
             ],
             "group": {
                 "kind": "build",

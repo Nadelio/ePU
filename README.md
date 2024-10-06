@@ -1,6 +1,6 @@
 # ePUx16 Architecture
 <p align="center">
- <img src="eBF_icon.svg" alt="ePUx16 logo" width="250" height="250">
+ <img src="MiscellanousFiles/eBF_icon.svg" alt="ePUx16 logo" width="250" height="250">
 </p>
 
 ### Overview

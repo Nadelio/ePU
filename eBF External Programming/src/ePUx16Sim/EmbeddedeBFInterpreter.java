@@ -18,9 +18,9 @@ public class EmbeddedeBFInterpreter {
     
     // MISC VARS
     private static int tokenNumber = 0;
-    private static HashMap<String, UnsignedByte[]> dependencies = new HashMap<String, UnsignedByte[]>();
-    private static HashMap<String, Word> dependencySizes = new HashMap<String, Word>();
-    private static HashMap<String, int[]> labels = new HashMap<String, int[]>();
+    private static HashMap<UnsignedByte, UnsignedByte[]> dependencies = new HashMap<UnsignedByte, UnsignedByte[]>();
+    private static HashMap<UnsignedByte, Word> dependencySizes = new HashMap<UnsignedByte, Word>();
+    private static HashMap<UnsignedByte, int[]> labels = new HashMap<UnsignedByte, int[]>();
 
     public static void interpretEBIN(File eBinaryFile) throws Exception{
         Scanner sc = new Scanner(eBinaryFile);
@@ -101,15 +101,15 @@ public class EmbeddedeBFInterpreter {
                     decrementStackPointer();
                     break;
                 case 12: // dependency load
-                    dependencies.put(eBinStrings[i+3], new UnsignedByte[]{ eBinTokens[i+1], eBinTokens[i+2] }); // ( Alias, { X, Y } )
-                    Word size = Word.convertToWord(Registers.findSize(dependencies.get(eBinStrings[i+3])[0], dependencies.get(eBinStrings[i+3])[1])); // ( Alias.x, Alias.y )
-                    Registers.readInProgram(dependencies.get(eBinStrings[i+3])[0], dependencies.get(eBinStrings[i+3])[1], size); // ( Alias.x, Alias.y, Size )
-                    dependencySizes.put(eBinStrings[i+1], size);
+                    dependencies.put(eBinTokens[i+3], new UnsignedByte[]{ eBinTokens[i+1], eBinTokens[i+2] }); // ( Alias, { X, Y } )
+                    Word size = Word.convertToWord(Registers.findSize(dependencies.get(eBinTokens[i+3])[0], dependencies.get(eBinTokens[i+3])[1])); // ( Alias.x, Alias.y )
+                    Registers.readInProgram(dependencies.get(eBinTokens[i+3])[0], dependencies.get(eBinTokens[i+3])[1], size); // ( Alias.x, Alias.y, Size )
+                    dependencySizes.put(eBinTokens[i+1], size);
                     i += 3;
                     break;
                 case 13: // dependency call
-                    if(dependencies.containsKey(eBinStrings[i+1])){
-                        Registers.startProgram(dependencies.get(eBinStrings[i+1])[0], dependencies.get(eBinStrings[i+1])[1], dependencySizes.get(eBinStrings[i+1]));
+                    if(dependencies.containsKey(eBinTokens[i+1])){
+                        Registers.startProgram(dependencies.get(eBinTokens[i+1])[0], dependencies.get(eBinTokens[i+1])[1], dependencySizes.get(eBinTokens[i+1]));
                     }
                     break;
                 case 14: // sys call
@@ -126,18 +126,24 @@ public class EmbeddedeBFInterpreter {
                 case 15: // END
                     break;
                 case 16: // build label
-                    labels.put(eBinStrings[i+1], new int[]{ pointerX, pointerY });
+                    labels.put(eBinTokens[i+1], new int[]{ pointerX, pointerY });
                     i++;
                     break;
                 case 17: // jump to label
-                    if(labels.containsKey(eBinStrings[i+1])){
-                        pointerX = labels.get(eBinStrings[i+1])[0];
-                        pointerY = labels.get(eBinStrings[i+1])[1];
+                    if(labels.containsKey(eBinTokens[i+1])){
+                        pointerX = labels.get(eBinTokens[i+1])[0];
+                        pointerY = labels.get(eBinTokens[i+1])[1];
+                    }
+                    i++;
+                    break;
+                case 18: // delete label
+                    if(labels.containsKey(eBinTokens[i+1])){
+                        labels.remove(eBinTokens[i+1]);    
                     }
                     i++;
                     break;
                 default:
-                    throw new UnrecognizedTokenException("Unrecognized Token: " + eBinTokens[i] + " at token number: " + tokenNumber);
+                    throw new UnrecognizedTokenException("Unrecognized Token: " + eBinStrings[i] + " at token number: " + tokenNumber);
             }
             tokenNumber++;
         }

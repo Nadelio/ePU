@@ -132,6 +132,12 @@ public class eBFInterpreter {
                     }
                     i++;
                     break;
+                case "!#":
+                    if(labels.containsKey(eBFTokens[i+1])){
+                        labels.remove(eBFTokens[i+1]);    
+                    }
+                    i++;
+                    break;
                 case "END":
                     break;
                 default:
@@ -235,14 +241,20 @@ public class eBFInterpreter {
                 case "0000000000001110": // write to terminal
                     System.out.print((char) (Tape[pointerX][pointerY].convertToInt() + 32));
                     break;
-                case "0000000000010001":
+                case "0000000000010000":
                     labels.put(eBinTokens[i+1], new int[]{ pointerX, pointerY });
+                    i++;
+                    break;
+                case "0000000000010001":
+                    if(labels.containsKey(eBinTokens[i+1])){
+                        pointerX = labels.get(eBinTokens[i+1])[0];
+                        pointerY = labels.get(eBinTokens[i+1])[1];
+                    }
                     i++;
                     break;
                 case "0000000000010010":
                     if(labels.containsKey(eBinTokens[i+1])){
-                        pointerX = labels.get(eBinTokens[i+1])[0];
-                        pointerY = labels.get(eBinTokens[i+1])[1];
+                        labels.remove(eBinTokens[i+1]);    
                     }
                     i++;
                     break;

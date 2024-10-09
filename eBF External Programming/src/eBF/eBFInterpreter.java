@@ -138,6 +138,9 @@ public class eBFInterpreter {
                     }
                     i++;
                     break;
+                case "\"":
+                    pointerValue = (pointerY * 256) + pointerX;
+                    break;
                 case "END":
                     break;
                 default:
@@ -257,6 +260,9 @@ public class eBFInterpreter {
                         labels.remove(eBinTokens[i+1]);    
                     }
                     i++;
+                    break;
+                case "0000000000010011":
+                    pointerValue = (pointerY * 256) + pointerX;
                     break;
                 case "0000000000001111": // END
                     break;

@@ -142,6 +142,9 @@ public class EmbeddedeBFInterpreter {
                     }
                     i++;
                     break;
+                case 19: // read cell position
+                    pointerValue = (pointerY * 256) + pointerX;
+                    break;
                 default:
                     throw new UnrecognizedTokenException("Unrecognized Token: " + eBinStrings[i] + " at token number: " + tokenNumber);
             }

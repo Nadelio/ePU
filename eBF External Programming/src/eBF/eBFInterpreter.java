@@ -141,6 +141,12 @@ public class eBFInterpreter {
                 case "\"":
                     pointerValue = (pointerY * 256) + pointerX;
                     break;
+                case "/*":
+                    while(!eBFTokens[i].equals("*/")){
+                        i++;
+                        if(eBFTokens[i].equals("*/")){ break; }
+                    }
+                    break;
                 case "END":
                     break;
                 default:

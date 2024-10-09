@@ -11,6 +11,7 @@
 - `>>`: push current pointer value to stack, set pointer value to `0`
 - `<<`: pop top value from stack and store in pointer value
 - `'`: read from the current value of the cell being pointed at
+- `"`: read the position of the current cell into the pointer value
 - `$`: system call for ePUx16, always needs 5 arguments following it &rarr; `$ <syscall id> <arg1> <arg2> <arg3> <arg4>`
 - `DPND`: create a dependency using the next two tokens &rarr; `DPND <.ebf/.ebin file path> <alias>`
 - `%`: call a dependency using its alias &rarr; `% <alias>`
@@ -18,6 +19,8 @@
 - `!#`: delete a label &rarr; `!# <alias>`
 - `@`: jump to the position associated with the label &rarr; `@ <alias>`
 - `END`: declare the end of a eBF program
+- `/*`: begin a comment block, needs a matching `*/`, compiler automatically removes comments during compilation
+- `*/`: end a comment block, needs a matching `/*`, compiler automatically removes comments during compilation
 - `!E`: *Compiler only token*, hints to the compiler that the user wants to compile to the embedded format of eBin, place at the *very beginning* of a program
 
 - *printing to terminal adds 32 to the current cell value being pointed at before printing

@@ -72,6 +72,58 @@ Pointer Position
   Label name
 ```
 
+# Examples
+Hello World in eBF:
+```cpp
+/* these are Dependency statements, use them to bring in other eBF programs */
+DPND .\..\bin\STD\Lowercase_A_Char.ebf a /* declare "Lowercase_A_Char.ebf" as "a" */
+DPND .\..\bin\STD\Uppercase_A_Char.ebf A /* declare "Uppercase_A_Char.ebf" as "A" */
+DPND .\..\bin\STD\clear.ebf clear /* declare "clear.ebf" as "clear" */
+
+/* "A" sets the value connected to the pointer to the character code for 'A' */
+% A + + + + + + + , = /* H */
+% a + + + + , = /* e */
++ + + + + + + , = = /* ll */
++ + + , = /* o */
+% clear  /* this clears the value connected to the pointer and the current cell */
+, = /* white space */
+% A + + + + + + + + + + + + + + + + + + + + + + , = /* W */
+% a + + + + + + + + + + + + + + , = /* o */
++ + + , = /* r */
+% a + + + + + + + + + + + , = /* l */
+% a + + + , = /* d */
+% clear
++ , = /* ! */
+/* this marks the end of the program */
+END
+```
+Declare "Hello World!" as a string and print it
+```cpp
+DPND .\..\writeHelloWorld.ebf writeHelloWorld /* assume this does as advertised */
+> # origin /* create label called origin on cell 1 */
+> # size + + + + + + + + + + + + , /* set cell 2 to 12 and create label called size */
+< < # sizeCopy , > > /* move to cell 0 and create a label called sizeCopy and write 12 to cell, then move back */
+> # stringBegin # temp /* label the beginning of the string character data and make temporary label */
+[ > # temp @ sizeCopy ' - , @ temp ] # stringEnd /* move to cell 15 and create a label called stringEnd */
+!# temp /* delete "temp" label */
+@ stringBegin /* move to label "stringBegin" (cell 3) */
+% writeHelloWorld /* write "Hello World!" to the string character data section of the string */
+@ size ' @ sizeCopy , /* copy size to sizeCopy */
+@ stringBegin # temp /* jump to the beginning of the string character data and create label called "temp" */
+[ @ temp ' = > # temp @ sizeCopy ' - , ] /* print all the characters in the string character data, decrement from sizeCopy until 0 */
+!# temp /* delete "temp" label */
+/* end program */
+END
+```
+Adding two numbers using the `% add [ a, b ]` function
+```cpp
+DPND .\..\STD\add.ebf add /* declare add function dependency */
++ + + >> /* push the number 3 to the stack */
++ + >> /* push the number 2 to the stack */
+% add , = /* add 2 and 3 together and write to terminal */
+END
+```
+
 # Getting Started
 - ***The point of entry for using either the compiler or the interpreter is the `eBF.bash` file, so you will need a way to run said `eBF.bash` file***
 - Put all 3 files (`eBF.bash`, `eBFCompiler.jar`, `eBFInterpreter.jar`) in a folder, then run the bash file using `bash eBF.bash -h`, this will give you all the flags, commands, and CLI syntax

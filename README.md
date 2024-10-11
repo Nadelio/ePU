@@ -1,4 +1,4 @@
-# ePUx16 Architecture
+# A computer in Excel? What!
 <p align="center">
  <img src="MiscellanousFiles/eBF_icon.svg" alt="ePUx16 logo" width="250" height="250">
 </p>
@@ -16,16 +16,6 @@
    - Excel's Lambda as metacode
    - 16-bit central processor, RAM chip, ROM chip, and ALU chip
    - User input
-   - Graphical interface (a screen)
-### Github Repository Contents
-- This Github Repository contains:
-    - The full ePUx16 Excel file
-    - An independently functioning eBF interpreter and compiler, built in Java
-    - A non-Excel simulator of the ePUx16 Architecture, built in Java
-    - Documentation on the eBF and eBin languages, and ePUx16 protocols
-    - A series of development tools used and built by Nadelio for use in the ePUx16 metacode and OS Environment
-    - A VSCode Extension with syntax highlighting for eBF
-    - A standard library built for use in the independently functioning eBF language
-    - Several miscellanous files from the development process, including diagrams, eBF/eBin keys, and full ePUx16 checklists
-### Credits
-- Nadelio : Creator, Primary Maintainer
+   - Graphical output (a screen)
+
+ <!-- add pictures of code, diagrams, and screenshots of images in the computer running here -->

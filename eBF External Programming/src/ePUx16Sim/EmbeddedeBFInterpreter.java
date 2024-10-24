@@ -145,6 +145,18 @@ public class EmbeddedeBFInterpreter {
                 case 19: // read cell position
                     pointerValue = (pointerY * 256) + pointerX;
                     break;
+                case 20: // set pointer value
+                    setPointerValue(new Word(eBinTokens[i+1], eBinTokens[i+2]));
+                    i += 2;
+                    break;
+                case 21: // move pointer up
+                    pointerY++;
+                    if(pointerY == 255){ pointerY = 0; }
+                    break;
+                case 22: // move pointer down
+                    pointerY--;
+                    if(pointerY == -1){ pointerY = 255; }
+                    break;
                 default:
                     throw new UnrecognizedTokenException("Unrecognized Token: " + eBinStrings[i] + " at token number: " + tokenNumber);
             }

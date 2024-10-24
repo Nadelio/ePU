@@ -166,19 +166,19 @@ public class eBFInterpreter {
         String[] eBinTokens = eBinCode.split(" ");
         for(int i = 0; i < eBinTokens.length; i++){
             switch(eBinTokens[i]){
-                case "0000000000000001":
+                case "0000000000000001": // increment pointer value
                     incrementPointerValue();
                     break;
-                case "0000000000000010":
+                case "0000000000000010": // decrement pointer value
                     decrementPointerValue();
                     break;
-                case "0000000000000011":
+                case "0000000000000011": // move right
                     movePointerRight();
                     break;
-                case "0000000000000100":
+                case "0000000000000100": // move left
                     movePointerLeft();
                     break;
-                case "0000000000000101":
+                case "0000000000000101": // start loop
                     if (Tape[pointerX][pointerY].isZero()) {
                         i++;
                         while(c > 0 || !eBinTokens[i].equals("0000000000000110")) {
@@ -193,7 +193,7 @@ public class eBFInterpreter {
                         }
                     }
                     break;
-                case "0000000000000110":
+                case "0000000000000110": // end loop
                     if (!Tape[pointerX][pointerY].isZero()) {
                         i--;
                         while(c > 0 || !eBinTokens[i].equals("0000000000000101")) {
@@ -209,30 +209,30 @@ public class eBFInterpreter {
                         }
                     }
                     break;
-                case "0000000000000111":
+                case "0000000000000111": // write to Tape
                     Tape[pointerX][pointerY] = Word.convertToWord(pointerValue);
                     break;
                 case "0000000000001101": // read from Tape
                     pointerValue = Tape[pointerX][pointerY].convertToInt();
                     break;
-                case "0000000000001000":
+                case "0000000000001000": // read from stdin
                     Tape[pointerX][pointerY].setHighByte(new UnsignedByte((byte) System.in.read()));
                     Tape[pointerX][pointerY].setLowByte(new UnsignedByte((byte) System.in.read()));
                     break;
-                case "0000000000001001":
+                case "0000000000001001": // push
                     incrementStackPointer();
                     stack[stackPointer] = Word.convertToWord(pointerValue);
                     pointerValue = 0;
                     break;
-                case "0000000000001010":
+                case "0000000000001010": // pop
                     pointerValue = stack[stackPointer].convertToInt();
                     stack[stackPointer] = Word.convertToWord(0);
                     decrementStackPointer();
                     break;
-                case "0000000000001011":
+                case "0000000000001011": // set dependency
                     if(eBinTokens[i+1].contains(".")){ dependencies.put(eBinTokens[i+2], new File(eBinTokens[i+1])); i += 2; }
                     break;
-                case "0000000000001100":
+                case "0000000000001100": // dependency call
                     if(dependencies.containsKey(eBinTokens[i+1])){
                         if(dependencies.get(eBinTokens[i+1]).getName().endsWith(".ebin")){
                             interpretEBIN(dependencies.get(eBinTokens[i+1]));
@@ -248,25 +248,37 @@ public class eBFInterpreter {
                 case "0000000000001110": // write to terminal
                     System.out.print((char) (Tape[pointerX][pointerY].convertToInt() + 32));
                     break;
-                case "0000000000010000":
+                case "0000000000010000": // create label
                     labels.put(eBinTokens[i+1], new int[]{ pointerX, pointerY });
                     i++;
                     break;
-                case "0000000000010001":
+                case "0000000000010001": // move pointer to label
                     if(labels.containsKey(eBinTokens[i+1])){
                         pointerX = labels.get(eBinTokens[i+1])[0];
                         pointerY = labels.get(eBinTokens[i+1])[1];
                     }
                     i++;
                     break;
-                case "0000000000010010":
+                case "0000000000010010": // remove label
                     if(labels.containsKey(eBinTokens[i+1])){
                         labels.remove(eBinTokens[i+1]);    
                     }
                     i++;
                     break;
-                case "0000000000010011":
+                case "0000000000010011": // set pointer value to pointer position
                     pointerValue = (pointerY * 256) + pointerX;
+                    break;
+                case "0000000000010100": // set
+                    pointerValue = Integer.parseInt(eBinTokens[i+1] + eBinTokens[i+2], 2);
+                    i += 2;
+                    break;
+                case "0000000000010101": // move up
+                    pointerY++;
+                    if(pointerY == 255){ pointerY = 0; }
+                    break;
+                case "0000000000010110": // move down
+                    pointerY--;
+                    if(pointerY == -1){ pointerY = 255; }
                     break;
                 case "0000000000001111": // END
                     break;

@@ -79,6 +79,12 @@ END
 - *printing to terminal adds 32 to the current cell value being pointed at before printing
 - *printing to terminal follows the Java Character Code conventions
 
+### Unimplemented eBin operations
+- *Interpreter still can interpret these operations, but there are no relevant symbols inside eBF, meant for use with Nullify's Sphere to eBin Compiler*
+- `0000000000010100`: set pointer value to the following two bytes
+- `0000000000010101`: move pointer position up (decrement Y address)
+- `0000000000010110`: move pointer position down (increment Y address)
+
 ### Documentation Terminology
 - Tape: Main memory unit, interacted with via the read and write instructions (`'`/`,`)
   - `[0][0][0][0]`

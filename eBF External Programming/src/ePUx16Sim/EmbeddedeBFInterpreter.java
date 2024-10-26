@@ -33,7 +33,6 @@ public class EmbeddedeBFInterpreter {
         String[] eBinStrings = eBinCode.split(" ");
         UnsignedByte[] eBinTokens = toUnsignedByte(eBinStrings);
         for(int i = 0; i < eBinTokens.length; i++){
-            System.out.println("Token: " + eBinTokens[i].value);
             switch(eBinTokens[i].value){ // interpret eBin tokens
                 case 1: // increment pointer value
                     incrementPointerValue();

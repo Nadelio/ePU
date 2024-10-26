@@ -123,42 +123,27 @@ public class ROMUnit {
         String[] romDataArray = romData.split(" ");
         String[] protectedMemoryDataArray = protectedMemoryData.split(" ");
 
-        System.out.println(romDataArray.length);
-        System.out.println(protectedMemoryDataArray.length);
-
-        // try {
-            int x = 0;
-            int y = 0;
-            for(String data : romDataArray){
-                ROM[x][y] = convertToWord(data);
-                x++;
-                if(x == 256){
-                    x = 0;
-                    y++;
-                }
+        int x = 0;
+        int y = 0;
+        for (String data : romDataArray) {
+            ROM[x][y] = convertToWord(data);
+            x++;
+            if (x == 256) {
+                x = 0;
+                y++;
             }
+        }
 
-            x = 0;
-            y = 0;
-            for(String data : protectedMemoryDataArray){
-                protectedMemory[x][y] = Boolean.parseBoolean(data);
-                x++;
-                if(x == 256){
-                    x = 0;
-                    y++;
-                }
+        x = 0;
+        y = 0;
+        for (String data : protectedMemoryDataArray) {
+            protectedMemory[x][y] = Boolean.parseBoolean(data);
+            x++;
+            if (x == 256) {
+                x = 0;
+                y++;
             }
-        // } catch (Exception e) {
-            // System.out.println("| Error Loading ROM Data |");
-            // System.out.println("| Resetting ROM Data |");
-            // for(int i = 0; i < 256; i++){
-            //     for(int j = 0; j < 256; j++){
-            //         ROM[i][j] = Word.zero();
-            //         protectedMemory[i][j] = false;
-            //     }
-            // }
-            // System.out.println("| ROM Data Reset Complete |");
-        // }
+        }   
     }
 
     public static Word convertToWord(String data){

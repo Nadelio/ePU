@@ -19,6 +19,10 @@ public class Word {
 
     public boolean isZero(){ return (Word.zero().getHighByte() == this.highByte) && (Word.zero().getLowByte() == this.lowByte); }
 
+    public boolean equals(Word secondByte){
+        return (this.highByte == secondByte.getHighByte()) && (this.lowByte == secondByte.getLowByte());
+    }
+
     public void setHighByte(UnsignedByte highByte){ this.highByte = highByte; }
     public void setLowByte(UnsignedByte lowByte){ this.lowByte = lowByte; }
 

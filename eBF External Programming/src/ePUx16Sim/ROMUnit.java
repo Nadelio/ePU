@@ -13,18 +13,19 @@ public class ROMUnit {
 
     private static Word[][] ROM = new Word[256][256];
     private static boolean[][] protectedMemory = new boolean[256][256];
+    private static String romData;
 
     public static void requestWriteData(UnsignedByte x, UnsignedByte y, Word data) {
         if(x.value < 0 || x.value > 255 || y.value < 0 || y.value > 255){ return; }
-        if(protectedMemory[y.value][x.value]){ return; }
-        ROM[y.value][x.value] = data;
+        if(protectedMemory[x.value][y.value]){ return; }
+        ROM[x.value][y.value] = data;
     }
 
     public static void requestWriteDataHeap(UnsignedByte x, UnsignedByte y, Word size) {
         for(int i = 0; i < size.convertToInt(); i++){
             if(x.value < 0 || x.value > 255 || y.value < 0 || y.value > 255){ return; }
-            if(protectedMemory[y.value][x.value]){ return; }
-            ROM[y.value][x.value] = RAMUnit.readData(new UnsignedByte(ramXMapAddress + i), new UnsignedByte(ramYMapAddress + i));
+            if(protectedMemory[x.value][y.value]){ return; }
+            ROM[x.value][y.value] = RAMUnit.readData(new UnsignedByte(ramXMapAddress + i), new UnsignedByte(ramYMapAddress + i));
             x.value++;
             if(x.value == 256){
                 x.value = 0;
@@ -35,7 +36,7 @@ public class ROMUnit {
 
     public static void setProtectedMemory(UnsignedByte x, UnsignedByte y, Word size) { // protected data rule //! possible iteration issue, check ScreenUnit data dump method for possible solution
         for(int i = 0; i < size.convertToInt(); i++){
-            protectedMemory[y.value][x.value] = true;
+            protectedMemory[x.value][y.value] = true;
             x.value++;
             if(x.value == 256){
                 x.value = 0;
@@ -116,17 +117,20 @@ public class ROMUnit {
         File raw = new File("ePUx16SimData/raw.rom");
         File protectedMem = new File("ePUx16SimData/protected.rom");
 
-        String romData = new String(Files.readAllBytes(Paths.get(raw.getCanonicalPath())));
+        romData = new String(Files.readAllBytes(Paths.get(raw.getCanonicalPath())));
         String protectedMemoryData = new String(Files.readAllBytes(Paths.get(protectedMem.getCanonicalPath())));
 
         String[] romDataArray = romData.split(" ");
         String[] protectedMemoryDataArray = protectedMemoryData.split(" ");
 
-        try {
+        System.out.println(romDataArray.length);
+        System.out.println(protectedMemoryDataArray.length);
+
+        // try {
             int x = 0;
             int y = 0;
             for(String data : romDataArray){
-                ROM[y][x] = convertToWord(data);
+                ROM[x][y] = convertToWord(data);
                 x++;
                 if(x == 256){
                     x = 0;
@@ -137,25 +141,30 @@ public class ROMUnit {
             x = 0;
             y = 0;
             for(String data : protectedMemoryDataArray){
-                protectedMemory[y][x] = Boolean.parseBoolean(data);
+                protectedMemory[x][y] = Boolean.parseBoolean(data);
                 x++;
                 if(x == 256){
                     x = 0;
                     y++;
                 }
             }
-        } catch (Exception e) {
-            for(int i = 0; i < 256; i++){
-                for(int j = 0; j < 256; j++){
-                    ROM[i][j] = Word.zero();
-                    protectedMemory[i][j] = false;
-                }
-            }
-        }
+        // } catch (Exception e) {
+            // System.out.println("| Error Loading ROM Data |");
+            // System.out.println("| Resetting ROM Data |");
+            // for(int i = 0; i < 256; i++){
+            //     for(int j = 0; j < 256; j++){
+            //         ROM[i][j] = Word.zero();
+            //         protectedMemory[i][j] = false;
+            //     }
+            // }
+            // System.out.println("| ROM Data Reset Complete |");
+        // }
     }
 
     public static Word convertToWord(String data){
         UnsignedByte[] bytes = EmbeddedeBFInterpreter.toUnsignedByte(new String[]{ data.substring(0, 8), data.substring(8) });
         return new Word(bytes[0], bytes[1]);
     }
+
+    public static String requestRawRomData(){ return romData; }
 }

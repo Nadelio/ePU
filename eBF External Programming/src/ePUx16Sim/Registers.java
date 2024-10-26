@@ -6,15 +6,25 @@ import java.io.FileWriter;
 public class Registers {
 
     private static Word[][] register = new Word[256][256];
+
+    public static void initializeRegisters() {
+        for (int i = 0; i < 256; i++) {
+            for (int j = 0; j < 256; j++) {
+                register[i][j] = Word.zero();
+            }
+        }
+    }
     
     public static void readInProgram(UnsignedByte x, UnsignedByte y, Word size) {
         if(size.isZero()){ System.out.println("| Program Size is Zero, Returning |"); return; }
-        for (int i = 0; i < size.convertToInt(); i++) {
-            register[x.value][y.value] = ROMUnit.readData(x, y);
-            x.value++;
-            if(x.value == 256){
-                x.value = 0;
-                y.value++;
+        int xPos = x.value;
+        int yPos = y.value;
+        for(int i = 0; i < size.convertToInt(); i++){
+            register[xPos][yPos] = ROMUnit.readData(new UnsignedByte(xPos), new UnsignedByte(yPos));
+            yPos++;
+            if(yPos == 256){
+                yPos = 0;
+                xPos++;
             }
         }
     }
@@ -25,12 +35,14 @@ public class Registers {
         File programFile = new File("program.ebin");
         FileWriter fw = new FileWriter(programFile);
 
+        int xPos = x.value;
+        int yPos = y.value;
         for(int i = 0; i < size.convertToInt(); i++){
-            fw.write(register[x.value][y.value].toString());
-            x.value++;
-            if(x.value == 256){
-                x.value = 0;
-                y.value++;
+            fw.write(register[xPos][yPos].toString() + " ");
+            yPos++;
+            if(yPos == 256){
+                yPos = 0;
+                xPos++;
             }
         }
 
@@ -45,23 +57,13 @@ public class Registers {
         ePUx16Sim.EmbeddedeBFInterpreter.interpretEBIN(programFile);
     }
 
-    //! Don't forget to compile to .jar // unable to compile/run on laptop, need to compile/run on desktop
-    public static int findSize(UnsignedByte x, UnsignedByte y) { //! ISSUE WITH NOT DETECTING END OF PROGRAM
+    public static int findSize(UnsignedByte x, UnsignedByte y) throws Exception {
+        final String END_TOKEN = "0000000000001111";
         System.out.println("| Finding Program Size |");
-        int size = 0;
-        while(!((ROMUnit.readData(x, y).convertToInt()) == (new Word(UnsignedByte.zero(), new UnsignedByte(15)).convertToInt()))){ //! HERE
-            size++;
-            x.value++;
-            if(x.value == 256){
-                x.value = 0;
-                y.value++;
-                if(y.value == 256){
-                    System.out.println("| Program Size Exceeds Maximum Size |");
-                    return 0;
-                }
-            }
-            if((ROMUnit.readData(x, y).convertToInt()) == (new Word(UnsignedByte.zero(), new UnsignedByte(15)).convertToInt())){ break; } //! HERE
-        }
+        Word exactPosition = new Word(x, y);
+        String rawData = ROMUnit.requestRawRomData();
+        String programData = rawData.substring(exactPosition.convertToInt() * 17, rawData.indexOf(END_TOKEN, exactPosition.convertToInt()) + 17);
+        int size = (programData.length())/17;
         System.out.println("| Found Program Size |");
         System.out.println("| Program Size: " + size + " |");
         return size;

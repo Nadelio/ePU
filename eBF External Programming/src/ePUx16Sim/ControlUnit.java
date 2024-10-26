@@ -92,6 +92,7 @@ public class ControlUnit {
         // read all data from file
         ROMUnit.loadFromFile();
         ScreenUnit.intializeScreen();
+        RAMUnit.initializeRAM();
         STARTED_FLAG = true;
         // add any other startup protocols here
     }

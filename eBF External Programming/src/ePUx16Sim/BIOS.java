@@ -14,6 +14,6 @@ public class BIOS {
         UnsignedByte runProg = new UnsignedByte(2);
         ControlUnit.commandUnit(new UnsignedByte[]{ start }); // start computer
         System.out.println("| Loading OS |");
-        ControlUnit.commandUnit(new UnsignedByte[]{ runProg, zero, two }); // load and start OS ( 2 : { x, y } )
+        ControlUnit.commandUnit(new UnsignedByte[]{ runProg, two, zero }); // load and start OS ( 2 : { y, x } )
     }
 }

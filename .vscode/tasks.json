@@ -95,7 +95,7 @@
             "command": "jar",
             "args": [
                 "cvfm", // 'm' option to include manifest file
-                "WriteToROM.jar",
+                "eBF External Programming/bin/Tooling/WriteToROM.jar",
                 "eBF External Programming/src/Tooling/manifest.txt", // path to the manifest file
                 "-C",
                 "eBF External Programming/bin/Tooling/classFiles", // Ensure this points to the correct directory
@@ -114,7 +114,7 @@
             "command": "jar",
             "args": [
                 "cvfm", // 'm' option to include manifest file
-                "eBFInterpreter.jar",
+                "eBF External Programming/bin/eBFInterpreter.jar",
                 "eBF External Programming/src/eBF/Interpreter/manifest.txt", // path to the manifest file
                 "-C",
                 "eBF External Programming/bin/eBFInterpreter/classFiles", // Ensure this points to the correct directory
@@ -133,7 +133,7 @@
             "command": "jar",
             "args": [
                 "cvfm", // 'm' option to include manifest file
-                "eBFCompiler.jar",
+                "eBF External Programming/bin/eBFCompiler.jar",
                 "eBF External Programming/src/eBF/Compiler/manifest.txt", // path to the manifest file
                 "-C",
                 "eBF External Programming/bin/eBFCompiler/classFiles", // Ensure this points to the correct directory
@@ -152,7 +152,7 @@
             "command": "jar",
             "args": [
                 "cvfm", // 'm' option to include manifest file
-                "ePUx16.jar",
+                "eBF External Programming/bin/ePUx16.jar", // output file
                 "eBF External Programming/src/ePUx16Sim/manifest.txt", // path to the manifest file
                 "-C",
                 "eBF External Programming/bin/ePUx16/classFiles", // Ensure this points to the correct directory

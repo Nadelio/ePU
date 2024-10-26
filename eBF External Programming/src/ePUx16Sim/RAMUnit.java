@@ -3,7 +3,7 @@ package ePUx16Sim;
 public class RAMUnit {
     public static Word[][] RAM = new Word[256][256];
 
-    public static void initalizeRAM(){
+    public static void initializeRAM(){
         for (int x = 0; x < 256; x++) {
             for (int y = 0; y < 256; y++) {
                 RAM[x][y] = new Word(UnsignedByte.zero(), UnsignedByte.zero());

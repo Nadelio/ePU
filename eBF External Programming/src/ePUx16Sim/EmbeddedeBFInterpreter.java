@@ -33,6 +33,7 @@ public class EmbeddedeBFInterpreter {
         String[] eBinStrings = eBinCode.split(" ");
         UnsignedByte[] eBinTokens = toUnsignedByte(eBinStrings);
         for(int i = 0; i < eBinTokens.length; i++){
+            System.out.println("Token: " + eBinTokens[i].value);
             switch(eBinTokens[i].value){ // interpret eBin tokens
                 case 1: // increment pointer value
                     incrementPointerValue();
@@ -85,9 +86,8 @@ public class EmbeddedeBFInterpreter {
                     break;
                 case 9: // read from user
                     System.out.print("Enter a character: ");
-                    RAMUnit.RAM[pointerX][pointerY].setHighByte(new UnsignedByte(System.in.read()));
-                    System.out.print("\nEnter another character: ");
-                    RAMUnit.RAM[pointerX][pointerY].setLowByte(new UnsignedByte(System.in.read()));
+                    RAMUnit.RAM[pointerX][pointerY].setHighByte(new UnsignedByte((byte) System.in.read()));
+                    RAMUnit.RAM[pointerX][pointerY].setLowByte(new UnsignedByte((byte) System.in.read()));
                     System.out.println();
                     break;
                 case 10: // push
@@ -150,12 +150,12 @@ public class EmbeddedeBFInterpreter {
                     i += 2;
                     break;
                 case 21: // move pointer up
-                    pointerY++;
-                    if(pointerY == 255){ pointerY = 0; }
-                    break;
-                case 22: // move pointer down
                     pointerY--;
                     if(pointerY == -1){ pointerY = 255; }
+                    break;
+                case 22: // move pointer down
+                    pointerY++;
+                    if(pointerY == 255){ pointerY = 0; }
                     break;
                 default:
                     throw new UnrecognizedTokenException("Unrecognized Token: " + eBinStrings[i] + " at token number: " + tokenNumber);

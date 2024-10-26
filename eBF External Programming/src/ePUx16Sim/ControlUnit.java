@@ -73,7 +73,7 @@ public class ControlUnit {
                 break;
             case 14:
                 if(STARTED_FLAG){ // write to terminal
-                    System.out.println((char) (EmbeddedeBFInterpreter.getPointerValue() + 32));
+                    System.out.print((char) (EmbeddedeBFInterpreter.getPointerValue() + 32));
                 }
                 break;
         }

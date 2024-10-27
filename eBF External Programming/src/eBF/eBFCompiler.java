@@ -119,7 +119,7 @@ public class eBFCompiler{
                             }
                             break;
                         case "%":
-                            if(EMBEDDED_eBF_FLAG){ eBinCode += eBinTokens[11] + " " + dependencyIndexMap.get(tokens[j+1]) + " "; }
+                            if(EMBEDDED_eBF_FLAG){ eBinCode += eBinTokens[11] + " " + Word.convertToWord(dependencyIndexMap.get(tokens[j+1])).toString() + " "; }
                             else { eBinCode += eBinTokens[11] + " " + tokens[j+1] + " "; }
                             eBFtoString += tokenNames[15] + " " + tokenNames[14] + " ";
                             processedeBFCode += tokens[j] + " " + tokens[j+1] + " ";
@@ -129,12 +129,12 @@ public class eBFCompiler{
                             eBinCode += eBinTokens[13] + " " + tokens[j+1] + " " + tokens[j+2] + " " + tokens[j+3] + " " + tokens[j+4] + " " + tokens[j+5] + " ";
                             eBFtoString += tokenNames[16] + " " + tokenNames[17] + " ";
                             processedeBFCode += tokens[j] + " " + tokens[j+1] + " " + tokens[j+2] + " " + tokens[j+3] + " " + tokens[j+4] + " " + tokens[j+5] + " ";
-                            j += 4;
+                            j += 5;
                             break;
                         case "#":
                             if(EMBEDDED_eBF_FLAG){
                                 eBinCode += eBinTokens[15] + " " + Word.convertToWord(labelIndex).toString() + " ";
-                                labelIndexMap.put(tokens[j+3], labelIndex);
+                                labelIndexMap.put(tokens[j+1], labelIndex);
                                 labelIndex++;
                             }
                             else { eBinCode += eBinTokens[15] + " " + tokens[j+1] + " "; }
@@ -143,14 +143,14 @@ public class eBFCompiler{
                             j++;
                             break;
                         case "!#":
-                            if(EMBEDDED_eBF_FLAG){ eBinCode += eBinTokens[17] + " " + labelIndexMap.get(tokens[j+1]) + " "; }
+                            if(EMBEDDED_eBF_FLAG){ eBinCode += eBinTokens[17] + " " + Word.convertToWord(labelIndexMap.get(tokens[j+1])).toString() + " "; }
                             else { eBinCode += eBinTokens[17] + " " + tokens[j+1] + " "; }
                             eBFtoString += tokenNames[24] + " " + tokenNames[23] + " ";
                             processedeBFCode += tokens[j] + " " + tokens[j+1] + " ";
                             j++;
                             break;
                         case "@":
-                            if(EMBEDDED_eBF_FLAG){ eBinCode += eBinTokens[16] + " " + labelIndexMap.get(tokens[j+1]) + " "; }
+                            if(EMBEDDED_eBF_FLAG){ eBinCode += eBinTokens[16] + " " + Word.convertToWord(labelIndexMap.get(tokens[j+1])).toString() + " "; }
                             else { eBinCode += eBinTokens[16] + " " + tokens[j+1] + " "; }
                             eBFtoString += tokenNames[22] + " " + tokenNames[23] + " ";
                             processedeBFCode += tokens[j] + " " + tokens[j+1] + " ";

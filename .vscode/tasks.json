@@ -12,7 +12,7 @@
                 "eBF External Programming/bin/Tooling/classFiles",
                 "./eBF External Programming/src/Tooling/WriteToROM.java",
                 "./eBF External Programming/src/ePUx16Sim/Word.java",
-                "./eBF External Programming/src/ePUx16Sim/UnsignedByte.java"
+                "./eBF External Programming/src/ePUx16Sim/UnsignedByte.java",
             ],
             "group": {
                 "kind": "build",

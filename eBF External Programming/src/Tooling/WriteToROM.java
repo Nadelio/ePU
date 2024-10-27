@@ -8,6 +8,8 @@ import java.nio.file.Paths;
 import java.io.IOException;
 import java.nio.file.Files;
 
+//! Still not fully fixed, issue with writing to proper memory locations, maybe incrementing the wrong cordinate?
+
 public class WriteToROM {
 
     private static Word[][] ROM = new Word[256][256];

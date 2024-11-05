@@ -268,8 +268,13 @@ public class eBFInterpreter {
                 case "0000000000010011": // set pointer value to pointer position
                     pointerValue = (pointerY * 256) + pointerX;
                     break;
-                case "0000000000010100": // set
+                case "0000000000010100": // set pointer value
                     pointerValue = Integer.parseInt(eBinTokens[i+1] + eBinTokens[i+2], 2);
+                    i += 2;
+                    break;
+                case "0000000000010111": // set pointer position
+                    pointerX = Integer.parseInt(eBinTokens[i+1], 2);
+                    pointerY = Integer.parseInt(eBinTokens[i+2], 2);
                     i += 2;
                     break;
                 case "0000000000010101": // move up

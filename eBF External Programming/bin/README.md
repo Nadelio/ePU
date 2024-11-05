@@ -83,7 +83,8 @@ END
 - *Interpreter still can interpret these operations, but there are no relevant symbols inside eBF, meant for use with Nullify's Sphere to eBin Compiler*
 - `0000000000010100`: set pointer value to the following two bytes
 - `0000000000010101`: move pointer position up (decrement Y address)
-- `0000000000010110`: move pointer position down (increment Y address)
+- `0000000000010110`: move pointer position down (increment Y address)lear
+- `0000000000010111`: set the pointer position to the following two bytes
 
 ### Documentation Terminology
 - Tape: Main memory unit, interacted with via the read and write instructions (`'`/`,`)

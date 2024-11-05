@@ -156,6 +156,11 @@ public class EmbeddedeBFInterpreter {
                     pointerY++;
                     if(pointerY == 255){ pointerY = 0; }
                     break;
+                case 23: // set pointer position
+                    pointerX = eBinTokens[i+1].value;
+                    pointerY = eBinTokens[i+2].value;
+                    i += 2;
+                    break;
                 default:
                     throw new UnrecognizedTokenException("Unrecognized Token: " + eBinStrings[i] + " at token number: " + tokenNumber);
             }

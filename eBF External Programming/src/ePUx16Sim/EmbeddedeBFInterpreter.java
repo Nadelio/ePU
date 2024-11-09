@@ -221,6 +221,10 @@ public class EmbeddedeBFInterpreter {
                 case 25: // NOP
                     Thread.sleep(10);
                     break;  
+                case 28: // write hardcode value to RAM
+                    RAMUnit.RAM[pointerX][pointerY] = new Word(eBinTokens[i+1], eBinTokens[i+2]);
+                    i++;
+                    break;
                 default:
                     throw new UnrecognizedTokenException("Unrecognized Token: " + eBinStrings[i] + " at token number: " + tokenNumber);
             }

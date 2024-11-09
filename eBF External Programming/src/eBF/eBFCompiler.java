@@ -177,12 +177,12 @@ public class eBFCompiler{
                         case "*/":
                             throw new Exception("Unmatched comment block at token " + j);
                         case "{":
-                            eBinCode += eBinTokens[26] + " ";
+                            eBinCode += eBinTokens[25] + " ";
                             eBFtoString += tokenNames[26] + " ";
                             processedeBFCode += tokens[j] + " ";
                             break;
                         case "}":
-                            eBinCode += eBinTokens[27] + " ";
+                            eBinCode += eBinTokens[26] + " ";
                             eBFtoString += tokenNames[27] + " ";
                             processedeBFCode += tokens[j] + " ";
                             break;

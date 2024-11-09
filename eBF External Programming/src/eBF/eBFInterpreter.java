@@ -356,6 +356,11 @@ public class eBFInterpreter {
                 case "0000000000011001": // NOP
                     Thread.sleep(10);
                     break;
+                case "0000000000011100": // Write hardcode value to tape
+                    UnsignedByte highByte = new UnsignedByte((byte) Integer.parseInt(eBinTokens[i+1], 2));
+                    UnsignedByte lowByte = new UnsignedByte((byte) Integer.parseInt(eBinTokens[i+2], 2));
+                    Tape[pointerX][pointerY] = new Word(highByte, lowByte);
+                    break;
                 case "0000000000001111": // END
                     break;
                 default:

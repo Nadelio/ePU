@@ -112,15 +112,16 @@ public class EmbeddedeBFInterpreter {
                     }
                     break;
                 case 14: // sys call
-                    /*
-                    ? Possibly add the ability to pass in labels as arguments?
-                    ? $ { label label label label label }    
-                    ? '{' '}' signifies that the sys call is using labels (if eBinTokens[i+1] == '{'){ ... }
-                    ? i += 7; for label arg sys call
-                    */
-
-                    ControlUnit.commandUnit(new UnsignedByte[]{ eBinTokens[i+1], eBinTokens[i+2], eBinTokens[i+3], eBinTokens[i+4], eBinTokens[i+5] });
-                    i += 5;
+                    if(eBinTokens[i+1].value == 26){ // '{'
+                        ControlUnit.commandUnit(getLabelValues(eBinTokens, i));
+                        if(eBinTokens[i+7].value != 27){ // '}'
+                            throw new Exception("Unmatched '{' at token number: " + (tokenNumber + 7));
+                        }
+                        i += 7;
+                    } else {
+                        ControlUnit.commandUnit(new UnsignedByte[]{ eBinTokens[i+1], eBinTokens[i+2], eBinTokens[i+3], eBinTokens[i+4], eBinTokens[i+5] });
+                        i += 5;
+                    }
                     break;
                 case 15: // END
                     break;
@@ -161,6 +162,65 @@ public class EmbeddedeBFInterpreter {
                     pointerY = eBinTokens[i+2].value;
                     i += 2;
                     break;
+                case 24: // interrupts
+                    //! both arguments are ALWAYS labels
+                    UnsignedByte firstArgument = eBinTokens[i+1];
+                    UnsignedByte comparison = eBinTokens[i+2];
+                    UnsignedByte secondArgument = eBinTokens[i+3];
+                    UnsignedByte dependency = eBinTokens[i+4];
+                    int[] firstValPos = labels.get(firstArgument);
+                    int[] secondValPos = labels.get(secondArgument);
+                    switch(comparison.value){
+                        case 0: // not equal
+                            if(RAMUnit.RAM[firstValPos[0]][firstValPos[1]].convertToInt() != RAMUnit.RAM[secondValPos[0]][secondValPos[1]].convertToInt()){
+                                if(dependencies.containsKey(dependency)){
+                                    Registers.startProgram(dependencies.get(dependency)[0], dependencies.get(dependency)[1], dependencySizes.get(dependency));
+                                }
+                            }
+                            break;
+                        case 1: // equal
+                            if(RAMUnit.RAM[firstValPos[0]][firstValPos[1]].convertToInt() == RAMUnit.RAM[secondValPos[0]][secondValPos[1]].convertToInt()){
+                                if(dependencies.containsKey(dependency)){
+                                    Registers.startProgram(dependencies.get(dependency)[0], dependencies.get(dependency)[1], dependencySizes.get(dependency));
+                                }
+                            }
+                            break;
+                        case 2: // greater than
+                            if(RAMUnit.RAM[firstValPos[0]][firstValPos[1]].convertToInt() > RAMUnit.RAM[secondValPos[0]][secondValPos[1]].convertToInt()){
+                                if(dependencies.containsKey(dependency)){
+                                    Registers.startProgram(dependencies.get(dependency)[0], dependencies.get(dependency)[1], dependencySizes.get(dependency));
+                                }
+                            }
+                            break;
+                        case 3: // less than
+                            if(RAMUnit.RAM[firstValPos[0]][firstValPos[1]].convertToInt() < RAMUnit.RAM[secondValPos[0]][secondValPos[1]].convertToInt()){
+                                if(dependencies.containsKey(dependency)){
+                                    Registers.startProgram(dependencies.get(dependency)[0], dependencies.get(dependency)[1], dependencySizes.get(dependency));
+                                }
+                            }
+                            break;
+                        case 4: // greater than or equal to
+                            if(RAMUnit.RAM[firstValPos[0]][firstValPos[1]].convertToInt() >= RAMUnit.RAM[secondValPos[0]][secondValPos[1]].convertToInt()){
+                                if(dependencies.containsKey(dependency)){
+                                    Registers.startProgram(dependencies.get(dependency)[0], dependencies.get(dependency)[1], dependencySizes.get(dependency));
+                                }
+                            }
+                            break;
+                        case 5: // less than or equal to
+                            if(RAMUnit.RAM[firstValPos[0]][firstValPos[1]].convertToInt() <= RAMUnit.RAM[secondValPos[0]][secondValPos[1]].convertToInt()){
+                                if(dependencies.containsKey(dependency)){
+                                    Registers.startProgram(dependencies.get(dependency)[0], dependencies.get(dependency)[1], dependencySizes.get(dependency));
+                                }
+                            }
+                            break;
+                        default:
+                            throw new UnrecognizedTokenException("Unrecognized Token: " + comparison + " at token number: " + (tokenNumber + 2));
+                    }
+                    i += 4;
+                    break;
+                case 25: // NOP
+                    Thread.sleep(10);
+                    break;  
                 default:
                     throw new UnrecognizedTokenException("Unrecognized Token: " + eBinStrings[i] + " at token number: " + tokenNumber);
             }
@@ -249,6 +309,22 @@ public class EmbeddedeBFInterpreter {
                 pointerX = 255;
             }
         }
+    }
+
+    private static UnsignedByte[] getLabelValues(UnsignedByte[] eBinTokens, int i){
+        int[][] labelPositions = new int[5][2];
+        labelPositions[0] = labels.get(eBinTokens[i+2]);
+        labelPositions[1] = labels.get(eBinTokens[i+3]);
+        labelPositions[2] = labels.get(eBinTokens[i+4]);
+        labelPositions[3] = labels.get(eBinTokens[i+5]);
+        labelPositions[4] = labels.get(eBinTokens[i+6]);
+
+        UnsignedByte[] labelValues = new UnsignedByte[5];
+        for(int j = 0; j < labelPositions.length; j++){
+            labelValues[j] = new UnsignedByte(RAMUnit.RAM[labelPositions[j][0]][labelPositions[j][1]].convertToInt());
+        }
+
+        return labelValues;
     }
 
     public static void setPointerValue(Word value){ pointerValue = value.convertToInt(); }

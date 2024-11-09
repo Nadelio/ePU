@@ -9,11 +9,11 @@ import ePUx16Sim.Word;
 public class eBFCompiler{
     // this compiles eBF tokens into eBin
 
-    private static final String[] eBFTokens = {"!E", "+", "-", ">", "<", "[", "]", ",", ".", ">>", "<<", "DPND", "%", "$", "=", "'", "#", "!#", "@", "\"", "/*", "*/", "END"};
-    private static final String[] eBinTokens = {"0000000000000001", "0000000000000010", "0000000000000011", "0000000000000100", "0000000000000101", "0000000000000110", "0000000000000111", "0000000000001000", "0000000000001001", "0000000000001010", "0000000000001011", "0000000000001100", "0000000000001101", "0000000000001110", "0000000000001111", "0000000000010000", "0000000000010001", "0000000000010010", "0000000000010011"}; // starts at 1 because 0 is reserved as empty space
-                                              // 0                   1                   2                   3                   4                   5                   6                   7                   8                   9                   10                  11                  12                  13                  14                  15                  16                  17                  18
-    private static final String[] tokenNames = {"{INCREMENT}", "{DECREMENT}", "{POINTER_INCREMENT}", "{POINTER_DECREMENT}", "{LOOP_START}", "{LOOP_END}", "{WRITE_TO_RAM}", "{INPUT}", "{PUSH_STACK}", "{POP_STACK}", "{DEPENDENCY}", "{DEPENDENCY_VALUE}", "{DEPENDENCY_X_ADDRESS}", "{DEPENDENCY_Y_ADDRESS}", "{DEPENDENCY_ALIAS}", "{DEPENDENCY_CALL}", "{SYSTEM_CALL}", "{SYSTEM_CALL_VALUE}", "{END_PROGRAM}", "{WRITE_TO_TERMINAL}", "{READ_FROM_RAM}", "{CREATE_LABEL}", "{JUMP_TO_LABEL}", "{LABEL_ALIAS}", "{REMOVE_LABEL}", "{READ_CELL_POSITION}"};
-                                              // 0,             1,             2,                     3,                     4,              5,            6,                7,         8,              9,             10,             11,                   12,                       13,                       14,                   15,                  16,              17,                    18,              19,                    20                 21                22                 23               24                25
+    private static final String[] eBFTokens = {"!E", "+", "-", ">", "<", "[", "]", ",", ".", ">>", "<<", "DPND", "%", "$", "=", "'", "#", "!#", "@", "\"", "/*", "*/", "{", "}", "END"};
+    private static final String[] eBinTokens = {"0000000000000001", "0000000000000010", "0000000000000011", "0000000000000100", "0000000000000101", "0000000000000110", "0000000000000111", "0000000000001000", "0000000000001001", "0000000000001010", "0000000000001011", "0000000000001100", "0000000000001101", "0000000000001110", "0000000000001111", "0000000000010000", "0000000000010001", "0000000000010010", "0000000000010011", "0000000000010100", "0000000000010101", "0000000000010110", "0000000000010111", "0000000000011000", "0000000000011001", "0000000000011010", "0000000000011011", "0000000000011100"}; // starts at 1 because 0 is reserved as empty space
+                                              // 0                   1                   2                   3                   4                   5                   6                   7                   8                   9                   10                  11                  12                  13                  14                  15                  16                  17                  18                  19                  20                  21                  22                  23                  24                  25                  26                  27
+    private static final String[] tokenNames = {"{INCREMENT}", "{DECREMENT}", "{POINTER_INCREMENT}", "{POINTER_DECREMENT}", "{LOOP_START}", "{LOOP_END}", "{WRITE_TO_RAM}", "{INPUT}", "{PUSH_STACK}", "{POP_STACK}", "{DEPENDENCY}", "{DEPENDENCY_VALUE}", "{DEPENDENCY_X_ADDRESS}", "{DEPENDENCY_Y_ADDRESS}", "{DEPENDENCY_ALIAS}", "{DEPENDENCY_CALL}", "{SYSTEM_CALL}", "{SYSTEM_CALL_VALUE}", "{END_PROGRAM}", "{WRITE_TO_TERMINAL}", "{READ_FROM_RAM}", "{CREATE_LABEL}", "{JUMP_TO_LABEL}", "{LABEL_ALIAS}", "{REMOVE_LABEL}", "{READ_CELL_POSITION}", "{OPEN_BRACE}", "{CLOSE_BRACE}"};
+                                              // 0,             1,             2,                     3,                     4,              5,            6,                7,         8,              9,             10,             11,                   12,                       13,                       14,                   15,                  16,              17,                    18,              19,                    20                 21                22                 23               24                25                      26              27
     private static String eBFtoString = "";
     private static String processedeBFCode = "";
 
@@ -176,6 +176,16 @@ public class eBFCompiler{
                             break;
                         case "*/":
                             throw new Exception("Unmatched comment block at token " + j);
+                        case "{":
+                            eBinCode += eBinTokens[26] + " ";
+                            eBFtoString += tokenNames[26] + " ";
+                            processedeBFCode += tokens[j] + " ";
+                            break;
+                        case "}":
+                            eBinCode += eBinTokens[27] + " ";
+                            eBFtoString += tokenNames[27] + " ";
+                            processedeBFCode += tokens[j] + " ";
+                            break;
                         case "END":
                             eBinCode += eBinTokens[14];
                             eBFtoString += tokenNames[18];

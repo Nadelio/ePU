@@ -285,6 +285,77 @@ public class eBFInterpreter {
                     pointerY--;
                     if(pointerY == -1){ pointerY = 255; }
                     break;
+                case "0000000000011000": // interrupts bytecode
+                    //! both arguments are ALWAYS labels
+                    String firstArgument = eBinTokens[i+1];
+                    String comparison = eBinTokens[i+2];
+                    String secondArgument = eBinTokens[i+3];
+                    String dependency = eBinTokens[i+4];
+                    int[] firstValPos = labels.get(firstArgument);
+                    int[] secondValPos = labels.get(secondArgument);
+                    switch(comparison){
+                        case "0000000000000000": // not equal
+                            if(Tape[firstValPos[0]][firstValPos[1]].convertToInt() != Tape[secondValPos[0]][secondValPos[1]].convertToInt()){
+                                if(dependencies.get(dependency).getName().endsWith(".ebin")){
+                                    interpretEBIN(dependencies.get(dependency));
+                                } else if(dependencies.get(dependency).getName().endsWith(".ebf")){
+                                    interpretEBF(dependencies.get(dependency));
+                                }
+                            }
+                            break;
+                        case "0000000000000001": // equal
+                            if(Tape[firstValPos[0]][firstValPos[1]].convertToInt() == Tape[secondValPos[0]][secondValPos[1]].convertToInt()){
+                                if(dependencies.get(dependency).getName().endsWith(".ebin")){
+                                    interpretEBIN(dependencies.get(dependency));
+                                } else if(dependencies.get(dependency).getName().endsWith(".ebf")){
+                                    interpretEBF(dependencies.get(dependency));
+                                }
+                            }
+                            break;
+                        case "0000000000000010": // greater than
+                            if(Tape[firstValPos[0]][firstValPos[1]].convertToInt() > Tape[secondValPos[0]][secondValPos[1]].convertToInt()){
+                                if(dependencies.get(dependency).getName().endsWith(".ebin")){
+                                    interpretEBIN(dependencies.get(dependency));
+                                } else if(dependencies.get(dependency).getName().endsWith(".ebf")){
+                                    interpretEBF(dependencies.get(dependency));
+                                }
+                            }
+                            break;
+                        case "0000000000000011": // less than
+                            if(Tape[firstValPos[0]][firstValPos[1]].convertToInt() < Tape[secondValPos[0]][secondValPos[1]].convertToInt()){
+                                if(dependencies.get(dependency).getName().endsWith(".ebin")){
+                                    interpretEBIN(dependencies.get(dependency));
+                                } else if(dependencies.get(dependency).getName().endsWith(".ebf")){
+                                    interpretEBF(dependencies.get(dependency));
+                                }
+                            }
+                            break;
+                        case "0000000000000100": // greater than or equal to
+                            if(Tape[firstValPos[0]][firstValPos[1]].convertToInt() >= Tape[secondValPos[0]][secondValPos[1]].convertToInt()){
+                                if(dependencies.get(dependency).getName().endsWith(".ebin")){
+                                    interpretEBIN(dependencies.get(dependency));
+                                } else if(dependencies.get(dependency).getName().endsWith(".ebf")){
+                                    interpretEBF(dependencies.get(dependency));
+                                }
+                            }
+                            break;
+                        case "0000000000000101": // less than or equal to
+                            if(Tape[firstValPos[0]][firstValPos[1]].convertToInt() <= Tape[secondValPos[0]][secondValPos[1]].convertToInt()){
+                                if(dependencies.get(dependency).getName().endsWith(".ebin")){
+                                    interpretEBIN(dependencies.get(dependency));
+                                } else if(dependencies.get(dependency).getName().endsWith(".ebf")){
+                                    interpretEBF(dependencies.get(dependency));
+                                }
+                            }
+                            break;
+                        default:
+                            throw new UnrecognizedTokenException("Unrecognized Token: " + comparison + " at token number: " + (tokenNumber + 2));
+                    }
+                    i += 4;
+                    break;    
+                case "0000000000011001": // NOP
+                    Thread.sleep(10);
+                    break;
                 case "0000000000001111": // END
                     break;
                 default:

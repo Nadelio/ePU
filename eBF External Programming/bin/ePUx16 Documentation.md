@@ -55,4 +55,4 @@
   - This syscall has 4 extra parameters: the X and Y address of the first targeted cell in ROM, and the size of the data dump (which uses two Unsigned Bytes)
   - This syscall will read from (i, 0) in the RAM until the given size is met, with i starting at 0, and incrementing until it equals the given size, the size of the data dump cannot be bigger than 255 or else an out of bounds error will be thrown and the system will crash
 - `00001110` : Write to Terminal
-  - This syscall will read the current value of the pointer and output it to the terminal as a char (adds 32 to the value to skip empty char characters)
+  - This syscall will read the current value of the pointer and output it to the terminal as a char

@@ -86,7 +86,7 @@ public class eBFInterpreter {
                     Tape[pointerX][pointerY] = Word.convertToWord(pointerValue);
                     break;
                 case "=": // write to terminal
-                    System.out.print((char) (Tape[pointerX][pointerY].convertToInt() + 32));
+                    System.out.print((char) (Tape[pointerX][pointerY].convertToInt()));
                     break;
                 case ".":
                     Tape[pointerX][pointerY].setHighByte(new UnsignedByte((byte) System.in.read()));
@@ -246,7 +246,7 @@ public class eBFInterpreter {
                     }
                     break;
                 case "0000000000001110": // write to terminal
-                    System.out.print((char) (Tape[pointerX][pointerY].convertToInt() + 32));
+                    System.out.print((char) (Tape[pointerX][pointerY].convertToInt()));
                     break;
                 case "0000000000010000": // create label
                     labels.put(eBinTokens[i+1], new int[]{ pointerX, pointerY });

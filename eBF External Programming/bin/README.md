@@ -58,7 +58,7 @@ END
 - `<`: decrement pointer position
 - `,`: write to tape
 - `.`: ask for character, store character in the current value of a cell being pointed at as `word`
-- `=`: write to terminal the current value of the cell being pointed at as a character*
+- `=`: write to terminal the current value of the cell being pointed at as a character
 - `[`: begin conditional loop, if the current value of the cell being pointed at  is `0` when `[` is met, skip, otherwise, loop until the current value of the cell being pointed at is `0`
 - `]`: end conditional loop
 - `>>`: push current pointer value to stack, set pointer value to `0`
@@ -76,15 +76,19 @@ END
 - `*/`: end a comment block, needs a matching `/*`, compiler automatically removes comments during compilation
 - `!E`: *Compiler only token*, hints to the compiler that the user wants to compile to the embedded format of eBin, place at the *very beginning* of a program
 
-- *printing to terminal adds 32 to the current cell value being pointed at before printing
 - *printing to terminal follows the Java Character Code conventions
 
 ### Unimplemented eBin operations
 - *Interpreter still can interpret these operations, but there are no relevant symbols inside eBF, meant for use with Nullify's Sphere to eBin Compiler*
 - `0000000000010100`: set pointer value to the following two bytes
 - `0000000000010101`: move pointer position up (decrement Y address)
-- `0000000000010110`: move pointer position down (increment Y address)lear
+- `0000000000010110`: move pointer position down (increment Y address)
 - `0000000000010111`: set the pointer position to the following two bytes
+- `0000000000011000`: interrupts/conditionals
+- `0000000000011001`: NOP, waits 10ms
+- `0000000000011010`: Syscall label syntax : `{`
+- `0000000000011011`: Syscall label syntax : `}`
+- `0000000000011100`: Write value to Tape
 
 ### Documentation Terminology
 - Tape: Main memory unit, interacted with via the read and write instructions (`'`/`,`)

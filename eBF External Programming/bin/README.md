@@ -85,6 +85,12 @@ END
 - `0000000000010110`: move pointer position down (increment Y address)
 - `0000000000010111`: set the pointer position to the following two bytes
 - `0000000000011000`: interrupts/conditionals
+  - `0000000000000001`: Not equal
+  - `0000000000000010`: Equal
+  - `0000000000000011`: Greater than
+  - `0000000000000100`: Less than
+  - `0000000000000101`: Greater than or equal to
+  - `0000000000000110`: Less than or equal to
 - `0000000000011001`: NOP, waits 10ms
 - `0000000000011010`: Syscall label syntax : `{`
 - `0000000000011011`: Syscall label syntax : `}`

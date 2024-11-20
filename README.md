@@ -15,7 +15,11 @@
    - full eBF/Hades/eBin language support with 20+ different symbols/commands tailored around the development of low-level systems, including operating systems
    - Java (soon 2B Niva) as metacode (planned to allow for extensibility through `.jar` files)
    - full CPU chip, RAM chip, ROM chip, and ALU chip
-   - User input
+   - User input (keyboard input, mouse movement, mouse input, etc.)
    - Graphical output (a screen)
+   - Multi-threaded system
+     - Render thread
+     - OS thread
+     - General process threads
 
  <!-- add pictures of code, diagrams, and screenshots of images in the computer running here -->

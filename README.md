@@ -12,7 +12,7 @@
 
 ### Features
 - The features of the Chronos VM x32 Architecture are:
-   - full eBF/Hades/eBin language support with 20+ different symbols/commands tailored around the development of low-level systems, including operating systems
+   - full eBF/Hades/Gaia language support with 20+ different symbols/commands tailored around the development of low-level systems, including operating systems
    - Java (soon 2B Niva) as metacode (planned to allow for extensibility through `.jar` files)
    - full CPU chip, RAM chip, ROM chip, and ALU chip
    - User input (keyboard input, mouse movement, mouse input, etc.)

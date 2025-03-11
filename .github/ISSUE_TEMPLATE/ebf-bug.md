@@ -1,6 +1,6 @@
 ---
 name: eBF Bug
-about: eBF bugs unrelated to the ePU
+about: eBF bugs unrelated to the Chronos VM
 title: "[eBF BUG]"
 labels: eBF Bug
 assignees: Nadelio

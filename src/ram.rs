@@ -1,4 +1,5 @@
 pub const RAM_SIZE: usize = u32::MAX as usize;
+pub const INPUT_BUFFER_DIM: [usize; 2] = [0, 64];
 
 impl Ram {
     pub fn new() -> Ram {

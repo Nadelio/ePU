@@ -44,11 +44,12 @@ impl Rom {
         
     }
 
+    ///! also check if has proper permissions
     pub fn read(&self, addr: usize) -> Result<u32, &str> {
         // read a 32-bit word from the rom
         if addr >= ROM_SIZE { return Err("Address out of bounds"); }
 
-        let invis_check = self.metadata[addr] & 0b00000010; //! also check if has proper permissions
+        let invis_check = self.metadata[addr] & 0b00000010;
         if invis_check == 1 { return Err("Read is not allowed on hidden memory without the proper permissions"); }
 
         Ok(self.rom[addr])

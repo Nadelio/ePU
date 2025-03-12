@@ -2,7 +2,6 @@ use chronos_vm::ram::*;
 use chronos_vm::rom::*;
 
 fn main() {
-
     // simple tests for RAM
     println!("0x{:X}", RAM_SIZE); // > 0xFFFFFFFF
     let mut ram = Ram::new();

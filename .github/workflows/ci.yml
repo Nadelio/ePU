@@ -1,0 +1,35 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - ChronosVMx32
+  pull_request:
+
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+          components: rustfmt, clippy
+
+      - name: Build Chronos 
+        run: cargo build --release
+      
+      - name: Test Chronos 
+        run: cargo test
+

@@ -10,7 +10,7 @@ impl Rom {
         Rom {
             source: source,
             rom: Box::new([0; ROM_SIZE]),
-            metadata: Box::new([0; ROM_SIZE])
+            metadata: Box::new([0; ROM_SIZE]),
         }
     }
 
@@ -23,10 +23,9 @@ impl Rom {
         if src_size != ROM_SIZE*5 { panic!("Source file is not the correct size"); }
         
         let src = File::open(self.source.clone()).expect("Could not open source file");
-        
-        let mut  buf = [0; 4];
+        let mut buf = [0; 4];
         let mut buf_index = 0;
-        for(i, byte) in src.bytes().enumerate() {
+        for (i, byte) in src.bytes().enumerate() {
             if i % 5 == 0 {
                 let data = byte.unwrap();
                 let addr = i / 5;
@@ -88,7 +87,7 @@ impl Rom {
         let prot_check = self.metadata[addr] & 0b00000001;
         if prot_check == 1 { return Err("Write is not allowed on protected memory"); }
 
-        self.rom[addr] = data;
+        self.metadata[addr] = data;
         return Ok(());
     }
 
@@ -108,5 +107,5 @@ impl Rom {
 pub struct Rom {
     source: String, // path to the source file
     rom: Box<[u32; ROM_SIZE]>,
-    metadata: Box<[u8; ROM_SIZE]>
+    metadata: Box<[u8; ROM_SIZE]>,
 }

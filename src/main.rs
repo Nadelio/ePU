@@ -6,10 +6,13 @@ use std::fs::File;
 use std::io::{self, Write};
 
 fn main() -> Result<(), Box<dyn Error>> {
+    File::open("test.rom").unwrap_or_else(|_| {
+        let mut f = File::create("test.rom").unwrap();
+        f.write_all(&[0; 0]).unwrap();
+        f
+    });
 
-    // This is fine to uncomment, I am leaving it in a comment as my system doesn't have test.rom 
-    // - Gummi
-/*    let mut rom = Rom::new("test.rom".to_string());
+    let mut rom = Rom::new("test.rom".to_string());
 
     let data = rom.read(0).unwrap_or(RomData {
         data: 0,
@@ -33,7 +36,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     } else {
         let data = r.unwrap();
         println!("Data: {:X}\nMetadata: {:X}", data.data, data.metadata);
-    }*/
+    }
 
     let mut vm_manager = VirtualMemoryManager::new();
     println!("Enter a virtual memory address in hex (e.g., 0x00401000) or 'q' to quit\n");

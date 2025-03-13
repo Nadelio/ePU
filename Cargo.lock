@@ -3,5 +3,5 @@
 version = 4
 
 [[package]]
-name = "chronos-vm"
+name = "chronos_vm"
 version = "0.1.0"

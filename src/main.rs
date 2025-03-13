@@ -1,27 +1,34 @@
-use chronos_vm::rom;
-use chronos_vm::rom::Rom;
-use chronos_vm::rom::RomData;
-use chronos_vm::ram::VirtualMemoryManager;
+use chronos_vm::ram::*;
+use chronos_vm::rom::*;
+use chronos_vm::*;
 use std::error::Error;
 use std::fs::File;
 use std::io::{self, Write};
 
-
 fn main() -> Result<(), Box<dyn Error>> {
-
     let _f = File::open("test.rom").unwrap_or_else(|_| {
         let mut f = File::create("test.rom").unwrap();
         f.write_all(&[0; rom::ROM_SIZE]).unwrap();
         f
     });
-    
+
     let mut rom = Rom::new("test.rom".to_string());
 
-    let data = rom.read(0).unwrap_or(RomData { data: 0, metadata: 0 }); // should be {0, 0} after second run
+    let data = rom.read(0).unwrap_or(RomData {
+        data: 0,
+        metadata: 0,
+    }); // should be {0, 0} after second run
 
     println!("Data: {:X}\nMetadata: {:X}", data.data, data.metadata);
 
-    rom.write(0, RomData { data: 0x0, metadata: 0b00000001}).unwrap();
+    rom.write(
+        0,
+        RomData {
+            data: 0x0,
+            metadata: 0b00000001,
+        },
+    )
+    .unwrap();
 
     let r = rom.read(0); // should err
     if r.is_err() {

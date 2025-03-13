@@ -1,6 +1,5 @@
 use std::{
-    fs::File,
-    io::{Read, Seek, Write},
+    fs::File, io::{Read, Seek, Write}
 };
 
 pub const ROM_SIZE: usize = u32::MAX as usize;
@@ -26,7 +25,6 @@ impl Rom {
         let mut data_buf = vec![RomData { data: 0, metadata: 0 }; size];
 
         for i in 0..size { data_buf[i] = self.read(lit_addr + i).unwrap_or(RomData {data: 0, metadata: 0}); }
-
 
         return Ok(data_buf);
     }

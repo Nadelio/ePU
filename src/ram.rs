@@ -185,4 +185,30 @@ impl VirtualMemoryManager {
         let frame_address = physical_address - offset;
         self.physical_memory.read(frame_address, offset)
     }
+
+    pub fn print_state(&self) {
+        println!("=== Virtual Memory Manager State ===");
+
+        println!("Page Directory:");
+        for (pdi, table) in self.page_directory.tables.iter().enumerate() {
+            if let Some(page_table) = table {
+                println!("  PDE 0x{:03X} -> Page Table Exists", pdi);
+                for (pti, entry) in page_table.entries.iter().enumerate() {
+                    if entry.present {
+                        let frame = entry.frame_address.unwrap();
+                        println!("    PTE 0x{:03X} -> Frame 0x{:08X}", pti, frame);
+                    }
+                }
+            }
+        }
+
+        println!("\nPhysical Memory:");
+        if self.physical_memory.allocated_frames.is_empty() {
+            println!("  No frames allocated.");
+        } else {
+            for &frame in &self.physical_memory.allocated_frames {
+                println!("  Frame Address: 0x{:08X}", frame);
+            }
+        }
+    }
 }

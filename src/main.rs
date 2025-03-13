@@ -59,7 +59,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
         let virtual_address = u32::from_str_radix(input.trim_start_matches("0x"), 16)?;
 
-        print!("Write (w), Read (r), Allocate (a) or Deallocate (d)? ");
+        print!("Write (w), Read (r), Print State (p), or Deallocate (d)? ");
         io::stdout().flush()?;
         let mut action = String::new();
         io::stdin().read_line(&mut action)?;
@@ -74,12 +74,21 @@ fn main() -> Result<(), Box<dyn Error>> {
                 let value: u8 = value.trim().parse()?;
                 vm_manager.write_memory(virtual_address as usize, value)?;
             }
-            "r" => {
-                let value = vm_manager.read_memory(virtual_address as usize)?;
-                println!("Value at 0x{:X}: {}", virtual_address, value);
-            }
+            "r" => println!(
+                "Value at 0x{:X}: {}",
+                virtual_address,
+                vm_manager.read_memory(virtual_address as usize)?
+            ),
+
+            "d" => vm_manager.deallocate_address(virtual_address as usize)?,
+            "p" => vm_manager.print_state(),
             _ => println!("Invalid action."),
         }
+        let physical_address = vm_manager.translate_address(virtual_address as usize)?;
+        println!(
+            "Virtual Address 0x{:X} -> Physical Address 0x{:X}",
+            virtual_address, physical_address
+        );
     }
 
     Ok(())

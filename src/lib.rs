@@ -1,5 +1,5 @@
 pub mod ram;
-pub use ram::Ram;
+pub use ram::VirtualMemoryManager;
 pub mod rom;
 pub use rom::Rom;
 pub mod screen_buffer;

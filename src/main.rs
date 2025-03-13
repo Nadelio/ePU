@@ -1,31 +1,43 @@
-use std::fs::File;
-use std::io::Write;
-
 use chronos_vm::ram::*;
-use chronos_vm::rom::*;
+use std::error::Error;
+use std::io::{self, Write};
+fn main() -> Result<(), Box<dyn Error>> {
+    let mut vm_manager = VirtualMemoryManager::new();
+    println!("Enter a virtual memory address in hex (e.g., 0x00401000) or 'q' to quit\n");
 
-fn main() {
+    loop {
+        print!("> ");
+        io::stdout().flush()?;
+        let mut input = String::new();
+        io::stdin().read_line(&mut input)?;
+        let input = input.trim();
 
-    if !std::path::Path::new("test.rom").exists() {
-        let mut file = File::create("test.rom").expect("Could not create test.rom");
-        file.write_all(&[0; ROM_SIZE*5]).expect("Could not write to test.rom");
+        if input == "q" {
+            break;
+        }
+
+        let virtual_address = usize::from_str_radix(input.trim_start_matches("0x"), 16)?;
+
+        print!("Allocate (a) or Deallocate (d)? ");
+        io::stdout().flush()?;
+        let mut action = String::new();
+        io::stdin().read_line(&mut action)?;
+        let action = action.trim().to_lowercase();
+
+        match action.as_str() {
+            "a" => {
+                let physical_address = vm_manager.translate_address(virtual_address)?;
+                println!(
+                    "Virtual Address 0x{:X} -> Physical Address 0x{:X}",
+                    virtual_address, physical_address
+                );
+            }
+            "d" => {
+                vm_manager.deallocate_address(virtual_address)?;
+            }
+            _ => println!("Invalid action. Use 'a' for allocate or 'd' for deallocate."),
+        }
     }
 
-    // simple tests for RAM
-    println!("0x{:X}", RAM_SIZE); // > 0xFFFFFFFF
-    let mut ram = Ram::new();
-    let _ = ram.write(0, 5); // (addr, data)
-    println!("{}", ram.read(0).unwrap()); // > 5
-    ram.flush();
-    println!("{:?}", ram.write(0, 1).unwrap()); // (addr, data) // > Address out of bounds: 0xFFFFFFFF
-    println!("{}", ram.read(0).unwrap()); // > Address out of bounds: 0xFFFFFFFF
-
-    // simple tests for ROM
-    let mut rom = Rom::new("test.rom".to_owned());
-    rom.load();
-    println!("{:?}", rom.read(0).unwrap()); // > 0
-    println!("{:?}", rom.write_meta(1, 0b00000001).unwrap()); // > 0
-    println!("{:?}", rom.write(1, 10).unwrap()); // > Write is not allowed on protected memory
-    println!("{:?}", rom.write(0, 10).unwrap()); // > ()
-    println!("{:?}", rom.read(0).unwrap()); // > 10
+    Ok(())
 }

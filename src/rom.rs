@@ -79,7 +79,7 @@ impl Rom {
         Ok(self.metadata[addr])
     }
 
-    pub fn write(&mut self, addr: usize, data: u32) -> Result<(), &str> {
+    pub fn write(&mut self, addr: usize, data: u8) -> Result<(), &str> {
         // write a 32-bit word to the rom
         if addr >= ROM_SIZE { return Err("Address out of bounds"); }
 

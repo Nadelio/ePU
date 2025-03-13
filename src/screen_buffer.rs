@@ -1,6 +1,6 @@
 //(1024 x 768) x 2 ints = 1,572,864 bytes
 
-pub const SCREEN_SIZE: [usize; 2] = [1024, 768];
+pub const SCREEN_SIZE: [usize; 2] = [512, 384];
 pub const ASPECT_RATIO: [u32; 2] = [4, 3];
 pub const BUFFER_PAGES: u32 = 2;
 pub const PAGE_STARTS: [usize; 2] = [0, SCREEN_SIZE[0] * SCREEN_SIZE[1]];

@@ -1,6 +1,6 @@
 use chronos_vm::ram::*;
 use chronos_vm::rom::*;
-use chronos_vm::*;
+use chronos_vm::print_colors::*;
 use std::error::Error;
 use std::fs::File;
 use std::io::{self, Write};
@@ -8,35 +8,29 @@ use std::io::{self, Write};
 fn main() -> Result<(), Box<dyn Error>> {
     File::open("test.rom").unwrap_or_else(|_| {
         let mut f = File::create("test.rom").unwrap();
-        f.write_all(&[0; 0]).unwrap();
+        f.write_all(&[0; ROM_SIZE]).unwrap(); // rom size was changed to 2048 bytes
         f
     });
 
     let mut rom = Rom::new("test.rom".to_string());
 
-    let data = rom.read(0).unwrap_or(RomData {
-        data: 0,
-        metadata: 0,
-    }); // should be {0, 0} after second run
+    println!("{}Testing ROM successful write...{}", DEBUG, RESET);
+    let w = rom.write(0, RomData { data: 1, metadata: 0x3 }); // will fail on 1< run
+    handle_write_result(w);
 
-    println!("Data: {:X}\nMetadata: {:X}", data.data, data.metadata);
+    println!("{}Testing ROM unsuccessful write...{}", DEBUG, RESET);
+    let w = rom.write(0, RomData { data: 0, metadata: 0x0 });
+    handle_write_result(w);
 
-    rom.write(
-        0,
-        RomData {
-            data: 0x0,
-            metadata: 0b00000001,
-        },
-    )
-    .unwrap();
+    println!("{}Testing ROM successful read...{}", DEBUG, RESET);
+    let r = rom.read(1);
+    handle_read_result(r);
 
-    let r = rom.read(0); // should err
-    if r.is_err() {
-        println!("Error reading from ROM: {:?}", r.err().unwrap());
-    } else {
-        let data = r.unwrap();
-        println!("Data: {:X}\nMetadata: {:X}", data.data, data.metadata);
-    }
+    println!("{}Testing ROM unsuccessful read...{}", DEBUG, RESET);
+    let r = rom.read(0);
+    handle_read_result(r);
+
+    // Test the RAM
 
     let mut vm_manager = VirtualMemoryManager::new();
     println!("Enter a virtual memory address in hex (e.g., 0x00401000) or 'q' to quit\n");
@@ -76,4 +70,18 @@ fn main() -> Result<(), Box<dyn Error>> {
     }
 
     Ok(())
+}
+
+fn handle_write_result(result: Result<(), &str>) {
+    match result {
+        Ok(_) => println!("{}Operation successful.{}", OK, RESET),
+        Err(e) => println!("{}Error: {}{}", ERR, e, RESET),
+    }
+}
+
+fn handle_read_result(result: Result<RomData, &str>) {
+    match result {
+        Ok(data) => println!("{}Data: {}0x{:X}\n{}Metadata: {}0x{:X}{}", OK, DATA, data.data, OK, DATA, data.metadata, RESET),
+        Err(e) => println!("{}Error: {}{}", ERR, e, RESET),
+    }
 }

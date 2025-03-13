@@ -1,31 +1,79 @@
-use std::fs::File;
-use std::io::Write;
-
 use chronos_vm::ram::*;
 use chronos_vm::rom::*;
+use chronos_vm::*;
+use std::error::Error;
+use std::fs::File;
+use std::io::{self, Write};
 
-fn main() {
+fn main() -> Result<(), Box<dyn Error>> {
+    File::open("test.rom").unwrap_or_else(|_| {
+        let mut f = File::create("test.rom").unwrap();
+        f.write_all(&[0; 0]).unwrap();
+        f
+    });
 
-    if !std::path::Path::new("test.rom").exists() {
-        let mut file = File::create("test.rom").expect("Could not create test.rom");
-        file.write_all(&[0; ROM_SIZE*5]).expect("Could not write to test.rom");
+    let mut rom = Rom::new("test.rom".to_string());
+
+    let data = rom.read(0).unwrap_or(RomData {
+        data: 0,
+        metadata: 0,
+    }); // should be {0, 0} after second run
+
+    println!("Data: {:X}\nMetadata: {:X}", data.data, data.metadata);
+
+    rom.write(
+        0,
+        RomData {
+            data: 0x0,
+            metadata: 0b00000001,
+        },
+    )
+    .unwrap();
+
+    let r = rom.read(0); // should err
+    if r.is_err() {
+        println!("Error reading from ROM: {:?}", r.err().unwrap());
+    } else {
+        let data = r.unwrap();
+        println!("Data: {:X}\nMetadata: {:X}", data.data, data.metadata);
     }
 
-    // simple tests for RAM
-    println!("0x{:X}", RAM_SIZE); // > 0xFFFFFFFF
-    let mut ram = Ram::new();
-    let _ = ram.write(0, 5); // (addr, data)
-    println!("{}", ram.read(0).unwrap()); // > 5
-    ram.flush();
-    println!("{:?}", ram.write(0, 1).unwrap()); // (addr, data) // > Address out of bounds: 0xFFFFFFFF
-    println!("{}", ram.read(0).unwrap()); // > Address out of bounds: 0xFFFFFFFF
+    let mut vm_manager = VirtualMemoryManager::new();
+    println!("Enter a virtual memory address in hex (e.g., 0x00401000) or 'q' to quit\n");
 
-    // simple tests for ROM
-    let mut rom = Rom::new("test.rom".to_owned());
-    rom.load();
-    println!("{:?}", rom.read(0).unwrap()); // > 0
-    println!("{:?}", rom.write_meta(1, 0b00000001).unwrap()); // > 0
-    println!("{:?}", rom.write(1, 10).unwrap()); // > Write is not allowed on protected memory
-    println!("{:?}", rom.write(0, 10).unwrap()); // > ()
-    println!("{:?}", rom.read(0).unwrap()); // > 10
+    loop {
+        print!("> ");
+        io::stdout().flush()?;
+        let mut input = String::new();
+        io::stdin().read_line(&mut input)?;
+        let input = input.trim();
+
+        if input == "q" {
+            break;
+        }
+
+        let virtual_address = usize::from_str_radix(input.trim_start_matches("0x"), 16)?;
+
+        print!("Allocate (a) or Deallocate (d)? ");
+        io::stdout().flush()?;
+        let mut action = String::new();
+        io::stdin().read_line(&mut action)?;
+        let action = action.trim().to_lowercase();
+
+        match action.as_str() {
+            "a" => {
+                let physical_address = vm_manager.translate_address(virtual_address)?;
+                println!(
+                    "Virtual Address 0x{:X} -> Physical Address 0x{:X}",
+                    virtual_address, physical_address
+                );
+            }
+            "d" => {
+                vm_manager.deallocate_address(virtual_address)?;
+            }
+            _ => println!("Invalid action. Use 'a' for allocate or 'd' for deallocate."),
+        }
+    }
+
+    Ok(())
 }

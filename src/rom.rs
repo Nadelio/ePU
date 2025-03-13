@@ -1,111 +1,114 @@
-use std::{fs::File, io::{Read, Write}};
+use std::{
+    fs::{File, OpenOptions},
+    io::{Read, Seek, SeekFrom, Write},
+};
 
 pub const ROM_SIZE: usize = u32::MAX as usize;
+
 /// p? = program data?\n id = data identifier (3 bits)\n +/- = sign\n 0?: null? ; r?: read allowed? ; w?: write allowed?
 pub const METADATA_FORMAT: &str = "[p?][id][+/-][0?][r?][w?]";
 
+pub struct Rom {
+    source: String, // path to the source file
+}
+
+#[derive(Clone)]
+pub struct RomData {
+    pub data: u32,
+    pub metadata: u8,
+}
 
 impl Rom {
     pub fn new(source: String) -> Rom {
-        Rom {
-            source: source,
-            rom: Box::new([0; ROM_SIZE]),
-            metadata: Box::new([0; ROM_SIZE]),
-        }
+        Rom { source }
     }
 
-    pub fn load(&mut self) {
-        // load the source file into the rom
-        // source file is a set of 5 * ROM_SIZE bytes
-        // each 5 bytes represents a data identifier, then a 32-bit word
-        
-        let src_size = File::open(self.source.clone()).expect("Could not open source file").bytes().count();
-        if src_size != ROM_SIZE*5 { panic!("Source file is not the correct size"); }
-        
-        let src = File::open(self.source.clone()).expect("Could not open source file");
-        let mut buf = [0; 4];
-        let mut buf_index = 0;
-        for (i, byte) in src.bytes().enumerate() {
-            if i % 5 == 0 {
-                let data = byte.unwrap();
-                let addr = i / 5;
-                self.metadata[addr] = data;
-            } else {
-                buf[buf_index] = byte.unwrap();
-                buf_index += 1;
-                if buf_index == 4 {
-                    let addr = i / 5;
-                    self.rom[addr] = u32::from_le_bytes(buf);
-                    buf_index = 0;
-                    buf = [0; 4];
-                }
-            }
+    pub fn read_many(&self, addr: usize, size: usize) -> Result<Vec<RomData>, &str> {
+        if addr >= ROM_SIZE || addr + size >= ROM_SIZE {
+            return Err("Address out of bounds");
         }
+
+        let lit_addr = addr * 5;
+        let mut file = File::open(&self.source).unwrap();
+        file.seek(SeekFrom::Start(lit_addr as u64)).unwrap();
+        let mut data_buf = vec![
+            RomData {
+                data: 0,
+                metadata: 0
+            };
+            size
+        ];
+
+        for i in 0..size {
+            data_buf[i] = self.read(lit_addr + i).unwrap_or(RomData {
+                data: 0,
+                metadata: 0,
+            });
+        }
+
+        Ok(data_buf)
     }
 
-    pub fn export(&self) {
-        // export the rom back to the source file
-        // source file is a set of 5 * ROM_SIZE bytes
-        // each 5 bytes represents a data identifier, then a 32-bit word
-        let mut src = File::open(self.source.clone()).expect("Could not open source file");
-        let mut i = 0;
-        while i < (ROM_SIZE*5) {
+    pub fn read(&self, addr: usize) -> Result<RomData, &str> {
+        if addr >= ROM_SIZE {
+            return Err("Address out of bounds");
+        }
+
+        let lit_addr = addr * 5;
+        let mut file = File::open(&self.source).unwrap();
+        file.seek(SeekFrom::Start(lit_addr as u64)).unwrap();
+        let mut buffer = [0; 5];
+        file.read_exact(&mut buffer).unwrap();
+
+        let md: u8 = buffer[0];
+
+        if md & 0b00000010 != 0 {
+            return Err("Read is not allowed on hidden memory without the proper permissions");
+        }
+
+        let d = u32::from_be_bytes([buffer[1], buffer[2], buffer[3], buffer[4]]);
+
+        Ok(RomData {
+            data: d,
+            metadata: md,
+        })
+    }
+
+    pub fn write_many(&mut self, addr: usize, data: Vec<RomData>, size: usize) -> Result<(), &str> {
+        if addr >= ROM_SIZE || addr + size >= ROM_SIZE {
+            return Err("Address out of bounds");
+        }
+
+        let mut f = OpenOptions::new().write(true).open(&self.source).unwrap();
+        f.seek(SeekFrom::Start((addr * 5) as u64)).unwrap();
+
+        for i in 0..size {
             let mut buf = [0u8; 5];
-            buf[0] = self.metadata[i/5];
-            buf[1..4].copy_from_slice(&self.rom[i/5].to_le_bytes());
-            src.write_all(&buf).expect("Could not write to source file");
-            i += 5;
+            buf[0] = data[i].metadata;
+            buf[1..5].copy_from_slice(&data[i].data.to_be_bytes());
+            f.write_all(&buf).unwrap();
         }
+
+        Ok(())
     }
 
-    ///! also check if has proper permission level (OS level) (currently not implemented)
-    pub fn read(&self, addr: usize) -> Result<u32, &str> {
-        // read a 32-bit word from the rom
-        if addr >= ROM_SIZE { return Err("Address out of bounds"); }
+    pub fn write(&mut self, addr: usize, data: RomData) -> Result<(), &str> {
+        if addr >= ROM_SIZE {
+            return Err("Address out of bounds");
+        }
 
-        let invis_check = self.metadata[addr] & 0b00000010;
-        if invis_check == 1 { return Err("Read is not allowed on hidden memory without the proper permissions"); }
+        if data.metadata & 0b00000001 != 0 {
+            return Err("Write is not allowed on protected memory");
+        }
 
-        Ok(self.rom[addr])
+        let mut f = OpenOptions::new().write(true).open(&self.source).unwrap();
+        f.seek(SeekFrom::Start((addr * 5) as u64)).unwrap();
+
+        let mut buf = [0u8; 5];
+        buf[0] = data.metadata;
+        buf[1..5].copy_from_slice(&data.data.to_be_bytes());
+        f.write_all(&buf).unwrap();
+
+        Ok(())
     }
-
-    pub fn read_meta(&self, addr: usize) -> Result<u8, &str> {
-        // read the metadata of a 32-bit word from the rom
-        if addr >= ROM_SIZE { return Err("Address out of bounds"); }
-
-        let invis_check = self.metadata[addr] & 0b00000010;
-        if invis_check == 1 { return Err("Read is not allowed on hidden memory without the proper permissions"); }
-        
-        Ok(self.metadata[addr])
-    }
-
-    pub fn write(&mut self, addr: usize, data: u8) -> Result<(), &str> {
-        // write a 32-bit word to the rom
-        if addr >= ROM_SIZE { return Err("Address out of bounds"); }
-
-        // check if the memory is protected
-        let prot_check = self.metadata[addr] & 0b00000001;
-        if prot_check == 1 { return Err("Write is not allowed on protected memory"); }
-
-        self.metadata[addr] = data;
-        return Ok(());
-    }
-
-    pub fn write_meta(&mut self, addr: usize, data: u8) -> Result<(), &str> {
-        // write the metadata of a 32-bit word to the rom
-        if addr >= ROM_SIZE { return Err("Address out of bounds"); }
-
-        // check if the memory is protected
-        let prot_check = self.metadata[addr] & 0b00000001;
-        if prot_check == 1 { return Err("Write is not allowed on protected memory"); }
-
-        self.metadata[addr] = data;
-        return Ok(());
-    }
-}
-
-pub struct Rom {
-    source: String, // path to the source file
-    rom: Box<[u32; ROM_SIZE]>,
-    metadata: Box<[u8; ROM_SIZE]>,
 }

@@ -1,10 +1,4 @@
 [package]
-name = "chronos-vm"
+name = "chronos_vm"
 version = "0.1.0"
 edition = "2024"
-
-[dependencies]
-
-[[bin]]
-name = "test"
-path = "src/main.rs"

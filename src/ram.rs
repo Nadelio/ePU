@@ -1,12 +1,51 @@
 use std::collections::HashSet;
 use std::error::Error;
 
+// There is ONE PD - Page Directory
+// 
+// The PD has 1024 entries
+//
+// Each PD entry (a PT) has 1024 entries for individual pages
+//
+// Each page stores 4096 bytes of information
+//
+// 4096 * 1024 * 1024 = 2 ^ 32
+//
 pub const PAGE_SIZE: usize = 4096;
 pub const PAGE_TABLE_ENTRIES: usize = 1024;
 pub const DIRECTORY_ENTRIES: usize = 1024;
 
+
+/* Notes on comment abbreviations:
+*
+* (P)age (D)irectory - The complete directory of all pages
+* (P)age (T)able - A singular entry in the PD, 
+*   containing a vector of addresses and a present states
+* (P)age (D)irectory (I)ndex - An offset to an index in the PD
+* (P)age (T)able (I)ndex - An offset to an index in the PT
+*/
+
+
+/* Note on why there isn't PhysMem -> VMem
+*
+*
+* Physical memory is not aware of virtual memory's existence, thus
+* physical memory cannot be translated back to virtual memory addresses
+*/
+
+
+/* Note on usage of `usize`:
+*
+* Throughout this file, `usize` is used instead of `u32`, as it will create less casts to index
+* into vectors and arrays. `usize` also allows for more modular code, as the bit-width of the
+* machine can be easily adapted to larger or smaller sizes if needed, without introducing/removing
+* many type casts
+*/
+
 #[derive(Debug, Clone)]
 pub struct PageTableEntry {
+
+    // A PhysMem address for the frame
     frame_address: Option<usize>,
     present: bool,
 }
@@ -22,6 +61,8 @@ impl PageTableEntry {
 
 #[derive(Debug, Clone)]
 struct PageTable {
+    // TODO: This will hold a fixed number of entries
+    // We can optimize it to be a heap array, but for now, I'll leave it as a vector
     entries: Vec<PageTableEntry>,
 }
 
@@ -35,6 +76,7 @@ impl PageTable {
 
 #[derive(Debug)]
 struct PageDirectory {
+    // TODO: This is also a fixed entry count, and can be changed to a heap array
     tables: Vec<Option<PageTable>>,
 }
 
@@ -48,8 +90,8 @@ impl PageDirectory {
 
 #[derive(Debug)]
 struct PhysicalMemory {
-    frames: Vec<Option<Vec<u8>>>,
-    allocated_frames: HashSet<usize>,
+    frames: Vec<Option<Vec<u8>>>, // these are values at addresses
+    allocated_frames: HashSet<usize>, // these are addresses of frames in use
 }
 
 impl PhysicalMemory {
@@ -62,7 +104,8 @@ impl PhysicalMemory {
 
     fn allocate_frame(&mut self) -> usize {
         let frame_address = self.frames.len() * PAGE_SIZE;
-        self.frames.push(Some(vec![0; PAGE_SIZE]));
+        self.frames.push(Some(vec![0; PAGE_SIZE])); // By default, push a bunch of 0's to a new
+        // The HashSet data structure should not have duplicates
         self.allocated_frames.insert(frame_address);
         frame_address
     }
@@ -122,37 +165,90 @@ impl VirtualMemoryManager {
         }
     }
 
+    // (P)age (T)able (I)ndex
+    // (P)age (D)irectory (I)ndex
     pub fn translate_address(&mut self, virtual_address: usize) -> Result<usize, Box<dyn Error>> {
+
+        // Mask and bitshift to find the indices
+
+        /*
+        * 
+        *
+        * Example PDI and PTI retrieval from an address
+        * 
+        * Address:
+        * +------------+
+        * | 0x33221100 |
+        * +------------+
+        *
+        * Let's expand this address
+        *
+        * +----------------------------------+
+        * | 0b110011001000100001000100000000 |
+        * +----------------------------------+
+        * 
+        * This is our full, 32-bit wide address in binary
+        *
+        * Let's expand the parts of this address
+        *
+        *    0b 1100 1100  | 10 0010 0001 |  0001 0000 0000 |
+        *     +-^^^^-^^^^ +-^^-^^^^-^^^^ +--^^^^-^^^^-^^^^-------------+
+        *     |           |              |> This is the offset         |
+        *     |           |              |> of the address in the page |
+        *     |           |              +-----------------------------+
+        *     |           |
+        *     |           +--------------------------------------------+
+        *     |           |> This is the offset in a page table record |
+        *     |           |> for the specific page (4KB)               |
+        *     |           +--------------------------------------------+
+        *     |
+        * +---+--------------------------------------------------------------+
+        * |> This is the offset in the Page Directory for the exact entry.   |
+        * |> The offset contains a specific page table record, which is used |
+        * |> to then find the specific page that the address resides at.     |
+        * +------------------------------------------------------------------+
+        */ 
         let pdi = (virtual_address >> 22) & 0x3FF;
         let pti = (virtual_address >> 12) & 0x3FF;
         let offset = virtual_address & 0xFFF;
 
+        // Check if the Page Directory has registered this PDI
         if self.page_directory.tables[pdi].is_none() {
+            // Make a new one
             self.page_directory.tables[pdi] = Some(PageTable::new());
         }
 
+        // The PD will have this PDI registered now
         let page_table = self.page_directory.tables[pdi].as_mut().unwrap();
 
+        // Register the PTI info in the PT if it has not been set
         if !page_table.entries[pti].present {
+            // Create a new frame in PhysMem
             let frame_address = self.physical_memory.allocate_frame();
+
+            // Set the entry to have the frame address we just retrieved
             page_table.entries[pti].frame_address = Some(frame_address);
             page_table.entries[pti].present = true;
         }
 
+        // We now look through the PT and find the PhysMem frame address
         let frame_address = page_table.entries[pti].frame_address.unwrap();
         Ok(frame_address + offset)
     }
 
     pub fn deallocate_address(&mut self, virtual_address: usize) -> Result<(), Box<dyn Error>> {
+        // Mask and bitshift to find indices
         let pdi = (virtual_address >> 22) & 0x3FF;
         let pti = (virtual_address >> 12) & 0x3FF;
 
+        // This PDI has not been allocated
         if self.page_directory.tables[pdi].is_none() {
             return Ok(());
         }
 
         let page_table = self.page_directory.tables[pdi].as_mut().unwrap();
 
+        // This PTI has not been allocated
         if !page_table.entries[pti].present {
             return Ok(());
         }
@@ -162,6 +258,7 @@ impl VirtualMemoryManager {
         page_table.entries[pti].present = false;
         page_table.entries[pti].frame_address = None;
 
+        // If everything in this PTI is empty, we will free it from the PD
         if page_table.entries.iter().all(|entry| !entry.present) {
             self.page_directory.tables[pdi] = None;
         }

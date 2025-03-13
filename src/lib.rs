@@ -1,5 +1,5 @@
-pub mod ram;
 pub mod print_colors;
+pub mod ram;
 pub use print_colors::*;
 pub use ram::VirtualMemoryManager;
 pub mod rom;

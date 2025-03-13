@@ -24,7 +24,9 @@ impl Rom {
     }
 
     pub fn read_many(&self, addr: usize, size: usize) -> Result<Vec<RomData>, &str> {
-        if addr >= ROM_SIZE || addr + size >= ROM_SIZE { return Err("Address out of bounds"); }
+        if addr >= ROM_SIZE || addr + size >= ROM_SIZE {
+            return Err("Address out of bounds");
+        }
 
         let lit_addr = addr * 5;
         let mut file = File::open(&self.source).unwrap();
@@ -39,7 +41,9 @@ impl Rom {
 
         for i in 0..size {
             let r = self.read(lit_addr + i);
-            if r.is_err() { return Err(r.err().unwrap()); }
+            if r.is_err() {
+                return Err(r.err().unwrap());
+            }
             let d = r.unwrap();
             if d.metadata & 0b00000010 != 0 {
                 return Err("Read is not allowed on hidden memory without the proper permissions");
@@ -51,7 +55,9 @@ impl Rom {
     }
 
     pub fn read(&self, addr: usize) -> Result<RomData, &str> {
-        if addr >= ROM_SIZE { return Err("Address out of bounds"); }
+        if addr >= ROM_SIZE {
+            return Err("Address out of bounds");
+        }
 
         let lit_addr = addr * 5;
         let mut file = File::open(&self.source).unwrap();
@@ -61,7 +67,9 @@ impl Rom {
 
         let md: u8 = buffer[0];
 
-        if md & 0b00000010 != 0 { return Err("Read is not allowed on hidden memory without the proper permissions"); }
+        if md & 0b00000010 != 0 {
+            return Err("Read is not allowed on hidden memory without the proper permissions");
+        }
 
         let d = u32::from_be_bytes([buffer[1], buffer[2], buffer[3], buffer[4]]);
 
@@ -72,16 +80,21 @@ impl Rom {
     }
 
     pub fn write_many(&mut self, addr: usize, data: Vec<RomData>, size: usize) -> Result<(), &str> {
-        if addr >= ROM_SIZE || addr + size >= ROM_SIZE { return Err("Address out of bounds"); }
+        if addr >= ROM_SIZE || addr + size >= ROM_SIZE {
+            return Err("Address out of bounds");
+        }
 
         let mut f = OpenOptions::new().write(true).open(&self.source).unwrap();
         f.seek(SeekFrom::Start((addr * 5) as u64)).unwrap();
 
         for i in 0..size {
-            
             let r = self.read(addr + i);
-            if r.is_err() { return Err(r.err().unwrap()); }
-            if r.unwrap().metadata & 0b00000001 != 0 { return Err("Write is not allowed on protected memory"); }
+            if r.is_err() {
+                return Err(r.err().unwrap());
+            }
+            if r.unwrap().metadata & 0b00000001 != 0 {
+                return Err("Write is not allowed on protected memory");
+            }
 
             let mut buf = [0u8; 5];
             buf[0] = data[i].metadata;
@@ -93,11 +106,17 @@ impl Rom {
     }
 
     pub fn write(&mut self, addr: usize, data: RomData) -> Result<(), &str> {
-        if addr >= ROM_SIZE { return Err("Address out of bounds"); }
+        if addr >= ROM_SIZE {
+            return Err("Address out of bounds");
+        }
 
         let r = self.read(addr);
-        if r.is_err() { return Err(r.err().unwrap()); }
-        if r.unwrap().metadata & 0b00000001 != 0 { return Err("Write is not allowed on protected memory"); }
+        if r.is_err() {
+            return Err(r.err().unwrap());
+        }
+        if r.unwrap().metadata & 0b00000001 != 0 {
+            return Err("Write is not allowed on protected memory");
+        }
 
         let mut f = OpenOptions::new().write(true).open(&self.source).unwrap();
         f.seek(SeekFrom::Start((addr * 5) as u64)).unwrap();

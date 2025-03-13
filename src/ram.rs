@@ -1,6 +1,6 @@
+use std::collections::HashSet;
 use std::error::Error;
 
-pub const RAM_SIZE: usize = u32::MAX as usize;
 pub const PAGE_SIZE: usize = 4096;
 pub const PAGE_TABLE_ENTRIES: usize = 1024;
 pub const DIRECTORY_ENTRIES: usize = 1024;
@@ -49,16 +49,21 @@ impl PageDirectory {
 #[derive(Debug)]
 struct PhysicalMemory {
     frames: Vec<Option<Vec<u8>>>,
+    allocated_frames: HashSet<usize>,
 }
 
 impl PhysicalMemory {
     fn new() -> Self {
-        PhysicalMemory { frames: Vec::new() }
+        PhysicalMemory {
+            frames: Vec::new(),
+            allocated_frames: HashSet::new(),
+        }
     }
 
     fn allocate_frame(&mut self) -> usize {
         let frame_address = self.frames.len() * PAGE_SIZE;
         self.frames.push(Some(vec![0; PAGE_SIZE]));
+        self.allocated_frames.insert(frame_address);
         frame_address
     }
 
@@ -68,7 +73,32 @@ impl PhysicalMemory {
             return Err("Invalid frame address".into());
         }
         self.frames[frame_index] = None;
+        self.allocated_frames.remove(&frame_address);
         Ok(())
+    }
+
+    fn read(&self, frame_address: usize, offset: usize) -> Result<u8, Box<dyn Error>> {
+        let frame_index = frame_address / PAGE_SIZE;
+        if let Some(frame) = &self.frames[frame_index] {
+            Ok(frame[offset])
+        } else {
+            Err("Invalid read operation: Frame not allocated".into())
+        }
+    }
+
+    fn write(
+        &mut self,
+        frame_address: usize,
+        offset: usize,
+        value: u8,
+    ) -> Result<(), Box<dyn Error>> {
+        let frame_index = frame_address / PAGE_SIZE;
+        if let Some(frame) = &mut self.frames[frame_index] {
+            frame[offset] = value;
+            Ok(())
+        } else {
+            Err("Invalid write operation: Frame not allocated".into())
+        }
     }
 }
 
@@ -93,82 +123,37 @@ impl VirtualMemoryManager {
     }
 
     pub fn translate_address(&mut self, virtual_address: usize) -> Result<usize, Box<dyn Error>> {
-        println!("\nTranslating virtual address: 0x{:X}", virtual_address);
-
         let pdi = (virtual_address >> 22) & 0x3FF;
         let pti = (virtual_address >> 12) & 0x3FF;
         let offset = virtual_address & 0xFFF;
 
-        println!("Step 1: Extracting indices from the virtual address.");
-        println!("  - Virtual Address: 0x{:X}", virtual_address);
-        println!("  - Page Directory Index (PDI): 0x{:X} (Bits 31-22)", pdi);
-        println!("  - Page Table Index (PTI): 0x{:X} (Bits 21-12)", pti);
-        println!("  - Offset: 0x{:X} (Bits 11-0)", offset);
-
         if self.page_directory.tables[pdi].is_none() {
-            println!(
-                "Step 2: Page Directory Entry (PDE) at index 0x{:X} is empty.",
-                pdi
-            );
-            println!("  - Allocating a new Page Table for this PDE.");
             self.page_directory.tables[pdi] = Some(PageTable::new());
         }
 
         let page_table = self.page_directory.tables[pdi].as_mut().unwrap();
 
         if !page_table.entries[pti].present {
-            println!(
-                "Step 3: Page Table Entry (PTE) at index 0x{:X} is empty.",
-                pti
-            );
-            println!("  - Allocating a new Physical Frame for this PTE.");
             let frame_address = self.physical_memory.allocate_frame();
             page_table.entries[pti].frame_address = Some(frame_address);
             page_table.entries[pti].present = true;
         }
 
         let frame_address = page_table.entries[pti].frame_address.unwrap();
-        let physical_address = frame_address + offset;
-
-        println!("Step 4: Calculating the Physical Address.");
-        println!("  - Frame Address: 0x{:X}", frame_address);
-        println!("  - Offset: 0x{:X}", offset);
-        println!(
-            "  - Physical Address: 0x{:X} + 0x{:X} = 0x{:X}",
-            frame_address, offset, physical_address
-        );
-
-        Ok(physical_address)
+        Ok(frame_address + offset)
     }
 
     pub fn deallocate_address(&mut self, virtual_address: usize) -> Result<(), Box<dyn Error>> {
-        println!("\nDeallocating virtual address: 0x{:X}", virtual_address);
-
         let pdi = (virtual_address >> 22) & 0x3FF;
         let pti = (virtual_address >> 12) & 0x3FF;
 
-        println!("Step 1: Extracting indices from the virtual address.");
-        println!("  - Virtual Address: 0x{:X}", virtual_address);
-        println!("  - Page Directory Index (PDI): 0x{:X} (Bits 31-22)", pdi);
-        println!("  - Page Table Index (PTI): 0x{:X} (Bits 21-12)", pti);
-
         if self.page_directory.tables[pdi].is_none() {
-            println!(
-                "Step 2: Page Directory Entry (PDE) at index 0x{:X} is empty.",
-                pdi
-            );
-            println!("  - Nothing to deallocate.");
             return Ok(());
         }
 
         let page_table = self.page_directory.tables[pdi].as_mut().unwrap();
 
         if !page_table.entries[pti].present {
-            println!(
-                "Step 3: Page Table Entry (PTE) at index 0x{:X} is already deallocated.",
-                pti
-            );
-            println!("  - Nothing to deallocate.");
             return Ok(());
         }
 
@@ -177,24 +162,27 @@ impl VirtualMemoryManager {
         page_table.entries[pti].present = false;
         page_table.entries[pti].frame_address = None;
 
-        println!(
-            "Step 4: Deallocated PTE at index 0x{:X} in Page Table at PDI 0x{:X}.",
-            pti, pdi
-        );
-        println!(
-            "  - Frame Address: 0x{:X} has been deallocated.",
-            frame_address
-        );
-
-        // Optional: Free the entire Page Table if all PTEs are deallocated
         if page_table.entries.iter().all(|entry| !entry.present) {
             self.page_directory.tables[pdi] = None;
-            println!(
-                "  - Page Table at PDI 0x{:X} is now empty and has been freed.",
-                pdi
-            );
         }
 
         Ok(())
+    }
+    pub fn write_memory(
+        &mut self,
+        virtual_address: usize,
+        value: u8,
+    ) -> Result<(), Box<dyn Error>> {
+        let physical_address = self.translate_address(virtual_address)?;
+        let offset = virtual_address & 0xFFF; // offset with v. addr
+        let frame_address = physical_address - offset; // preventing collisions
+        self.physical_memory.write(frame_address, offset, value)
+    }
+
+    pub fn read_memory(&mut self, virtual_address: usize) -> Result<u8, Box<dyn Error>> {
+        let physical_address = self.translate_address(virtual_address)?;
+        let offset = virtual_address & 0xFFF;
+        let frame_address = physical_address - offset;
+        self.physical_memory.read(frame_address, offset)
     }
 }

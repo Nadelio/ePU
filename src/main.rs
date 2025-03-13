@@ -6,12 +6,6 @@ use std::fs::File;
 use std::io::{self, Write};
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let _f = File::open("test.rom").unwrap_or_else(|_| {
-        let mut f = File::create("test.rom").unwrap();
-        f.write_all(&[0; rom::ROM_SIZE]).unwrap();
-        f
-    });
-
     let mut rom = Rom::new("test.rom".to_string());
 
     let data = rom.read(0).unwrap_or(RomData {

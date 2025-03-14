@@ -17,18 +17,18 @@ fn main() -> Result<(), Box<dyn Error>> {
     
     let mut rom = Rom::new("test.rom".to_string());
 
-    let data = rom.read(0).unwrap_or(RomData { data: 0, metadata: 0 }); // should be {0, 0} after second run
+    let data = rom.read(0).unwrap_or(RomData { data: 0, typedata: 0 }); // should be {0, 0} after second run
 
-    println!("Data: {:X}\nMetadata: {:X}", data.data, data.metadata);
+    println!("Data: {:X}\nMetadata: {:X}", data.data, data.typedata);
 
-    rom.write(0, RomData { data: 0x0, metadata: 0b00000001}).unwrap();
+    rom.write(0, RomData { data: 0x0, typedata: 0b00000001}).unwrap();
 
     let r = rom.read(0); // should err
     if r.is_err() {
         println!("Error reading from ROM: {:?}", r.err().unwrap());
     } else {
         let data = r.unwrap();
-        println!("Data: {:X}\nMetadata: {:X}", data.data, data.metadata);
+        println!("Data: {:X}\nMetadata: {:X}", data.data, data.typedata);
     }
 
     let mut vm_manager = VirtualMemoryManager::new();

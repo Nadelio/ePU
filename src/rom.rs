@@ -15,7 +15,7 @@ pub struct Rom {
 #[derive(Clone)]
 pub struct RomData {
     pub data: u32,
-    pub metadata: u8,
+    pub typedata: u8,
 }
 
 impl Rom {
@@ -45,7 +45,7 @@ impl Rom {
                 return Err(r.err().unwrap());
             }
             let d = r.unwrap();
-            if d.metadata & 0b00000010 != 0 {
+            if d.typedata & 0b00000010 != 0 {
                 return Err("Read is not allowed on hidden memory without the proper permissions");
             }
             data_buf[i] = d;
@@ -92,7 +92,7 @@ impl Rom {
             if r.is_err() {
                 return Err(r.err().unwrap());
             }
-            if r.unwrap().metadata & 0b00000001 != 0 {
+            if r.unwrap().typedata & 0b00000001 != 0 {
                 return Err("Write is not allowed on protected memory");
             }
 
@@ -128,14 +128,4 @@ impl Rom {
 
         Ok(())
     }
-}
-
-pub struct Rom {
-    source: String, // path to the source file
-}
-
-#[derive(Clone)]
-pub struct RomData {
-    pub data: u32,
-    pub typedata: u8
 }

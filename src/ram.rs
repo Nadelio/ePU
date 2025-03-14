@@ -191,22 +191,22 @@ impl VirtualMemoryManager {
         *
         * Let's expand the parts of this address
         *
-        *       00 1100 1100 | 10 0010 0001 |  0001 0000 0000 |
-        *     +-^^-^^^^-^^^^ +-^^-^^^^-^^^^ +--^^^^-^^^^-^^^^-------------+
-        *     |              |              |> This is the offset         |
-        *     |              |              |> of the address in the page |
-        *     |              |              +-----------------------------+
-        *     |              |
-        *     |              +--------------------------------------------+
-        *     |              |> This is the offset in a page table record |
-        *     |              |> for the specific page (4KB)               |
-        *     |              +--------------------------------------------+
-        *     |
-        * +---+--------------------------------------------------------------+
-        * |> This is the offset in the Page Directory for the exact entry.   |
-        * |> The offset contains a specific page table record, which is used |
-        * |> to then find the specific page that the address resides at.     |
-        * +------------------------------------------------------------------+
+        *     │ 00 1100 1100 │ 10 0010 0001 │ 0001 0000 0000 │
+        *     ├─^^─^^^^─^^^^ ├─^^─^^^^─^^^^ ├─^^^^─^^^^─^^^^──────────────┐
+        *     │              │              │  This is the offset         │
+        *     │              │              │  of the address in the page │
+        *     │              │              └─────────────────────────────┘
+        *     │              │
+        *     │              ├────────────────────────────────────────────┐
+        *     │              │  This is the offset in a page table record │
+        *     │              │  for the specific page (4KB)               │
+        *     │              └────────────────────────────────────────────┘
+        *     │
+        * ┌───┴──────────────────────────────────────────────────────────────┐
+        * │  This is the offset in the Page Directory for the exact entry.   │
+        * │  The offset contains a specific page table record, which is used │
+        * │  to then find the specific page that the address resides at.     │
+        * └──────────────────────────────────────────────────────────────────┘
         */ 
         let pdi = (virtual_address >> 22) & 0x3FF;
         let pti = (virtual_address >> 12) & 0x3FF;

@@ -1,10 +1,10 @@
 [package]
-name = "chronos-vm"
+name = "chronos_vm"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+colored = "3.0.0"
 
-[[bin]]
-name = "test"
-path = "src/main.rs"
+[profile.release]
+debug = true

@@ -1,3 +1,4 @@
+use chronos_vm::ram::info;
 use chronos_vm::ram::*;
 use chronos_vm::rom::*;
 use colored::*;
@@ -15,17 +16,23 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut rom = Rom::new("test.rom".to_string());
 
     println!("{}", "Testing ROM successful write...".yellow());
-    let w = rom.write(0, RomData {
-        data: 1,
-        typedata: 0x3,
-    }); // will fail on 1< run
+    let w = rom.write(
+        0,
+        RomData {
+            data: 1,
+            typedata: 0x3,
+        },
+    ); // will fail on 1< run
     handle_write_result(w);
 
     println!("{}", "Testing ROM unsuccessful write...".yellow());
-    let w = rom.write(0, RomData {
-        data: 0,
-        typedata: 0x0,
-    });
+    let w = rom.write(
+        0,
+        RomData {
+            data: 0,
+            typedata: 0x0,
+        },
+    );
     handle_write_result(w);
 
     println!("{}", "Testing ROM successful read...".yellow());
@@ -35,6 +42,18 @@ fn main() -> Result<(), Box<dyn Error>> {
     println!("{}", "Testing ROM unsuccessful read...".yellow());
     let r = rom.read(0);
     handle_read_result(r);
+    info();
+    let mut machine = Machine::new();
+    machine.create_bitmap()?;
+    for _ in 0..=16 {
+        println!("Allocated a page at 0x{:x}", machine.alloc()?);
+    }
+
+    // Change these addresses to generate an access violation/segfault
+    machine.dealloc(0x24000)?;
+    println!("Allocated a page at 0x{:x}", machine.alloc()?);
+    machine.write(0x24000, 33)?;
+    println!("Read a value of {}", machine.read(0x24000)?);
 
     // Test the RAM
     let mut vm_manager = VirtualMemoryManager::new();

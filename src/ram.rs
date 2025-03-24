@@ -330,3 +330,82 @@ impl VirtualMemoryManager {
         }
     }
 }
+
+#[derive(Debug)]
+pub struct Machine {
+    memory: VirtualMemoryManager,
+}
+const FIRST_AVAILABLE_ADDRESS: usize = 0x20000;
+impl Machine {
+    pub fn new() -> Self {
+        Self {
+            memory: VirtualMemoryManager::new(),
+        }
+    }
+    pub fn create_bitmap(&mut self) -> Result<(), Box<dyn Error>> {
+        // We need to create a bitmap at the lower addresses 0x0000 -> 0x5000
+        // Each index in the bitmap represents a bit being on or off
+        for i in 0..=FIRST_AVAILABLE_ADDRESS {
+            self.memory.write_memory(i, 0)?;
+        }
+        Ok(())
+    }
+    pub fn alloc(&mut self) -> Result<usize, Box<dyn Error>> {
+        // We need to find the first available bit
+        let mut available_addr = 0;
+        let mut available_index = 0;
+        let mut found = false;
+        'outer: for i in 0..=FIRST_AVAILABLE_ADDRESS {
+            let mut current_addr_value = self.memory.read_memory(i)?;
+            for j in 0..8 {
+                if (current_addr_value >> j) & 1 == 0 {
+                    current_addr_value |= 1 << j;
+                    self.memory.write_memory(i, current_addr_value)?;
+                    available_addr = i;
+                    available_index = j;
+                    found = true;
+                    break 'outer;
+                }
+            }
+        }
+        if !found {
+            return Err("No address found".into());
+        }
+        return Ok(FIRST_AVAILABLE_ADDRESS + ((available_addr * 8) + available_index) * PAGE_SIZE);
+    }
+    pub fn is_allocated(&mut self, virt_addr: usize) -> Result<bool, Box<dyn Error>> {
+        let bitmap_index = (virt_addr - FIRST_AVAILABLE_ADDRESS) / PAGE_SIZE / 8;
+        let bitentry_index = (virt_addr - FIRST_AVAILABLE_ADDRESS) / PAGE_SIZE;
+        let bitmap_value = self.memory.read_memory(bitmap_index)?;
+        let new_value = bitmap_value & !(1 << (bitentry_index % 8));
+        Ok(bitmap_value != new_value)
+    }
+    pub fn is_not_allocated(&mut self, virt_addr: usize) -> Result<bool, Box<dyn Error>> {
+        Ok(!(self.is_allocated(virt_addr)?))
+    }
+    pub fn write(&mut self, virt_addr: usize, value: u8) -> Result<(), Box<dyn Error>> {
+        if self.is_not_allocated(virt_addr)? {
+            return Err("Segmentation fault".into());
+        }
+        Ok(self.memory.write_memory(virt_addr, value)?)
+    }
+    pub fn read(&mut self, virt_addr: usize) -> Result<u8, Box<dyn Error>> {
+        if self.is_not_allocated(virt_addr)? {
+            return Err("Segmentation fault".into());
+        }
+        Ok(self.memory.read_memory(virt_addr)?)
+    }
+    pub fn dealloc(&mut self, virt_addr: usize) -> Result<(), Box<dyn Error>> {
+        let bitmap_index = (virt_addr - FIRST_AVAILABLE_ADDRESS) / PAGE_SIZE / 8;
+        let bitentry_index = (virt_addr - FIRST_AVAILABLE_ADDRESS) / PAGE_SIZE;
+        let bitmap_value = self.memory.read_memory(bitmap_index)?;
+        let new_value = bitmap_value & !(1 << (bitentry_index % 8));
+        self.memory.write_memory(bitmap_index, new_value)?;
+        Ok(())
+    }
+}
+
+pub fn info() {
+    let addressable_space = FIRST_AVAILABLE_ADDRESS * 8 * PAGE_SIZE;
+    println!("This allocator can allocate 0x{addressable_space} memory addresses");
+}

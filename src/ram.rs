@@ -1,38 +1,37 @@
 use std::collections::HashSet;
 use std::error::Error;
 
-// There is ONE PD - Page Directory
-// 
-// The PD has 1024 entries
-//
-// Each PD entry (a PT) has 1024 entries for individual pages
-//
-// Each page stores 4096 bytes of information
-//
-// 4096 * 1024 * 1024 = 2 ^ 32
-//
+/* There is ONE PD - Page Directory
+*
+* The PD has 1024 entries
+*
+* Each PD entry (a PT) has 1024 entries for individual pages
+*
+* Each page stores 4096 bytes of information
+*
+* 4096 * 1024 * 1024 = 2 ^ 32
+*/
+
 pub const PAGE_SIZE: usize = 4096;
 pub const PAGE_TABLE_ENTRIES: usize = 1024;
 pub const DIRECTORY_ENTRIES: usize = 1024;
-
+pub const DEFAULT_FRAME_COUNT: usize = 512; // Default frames to allocate in hashset for PhysMem
 
 /* Notes on comment abbreviations:
 *
 * (P)age (D)irectory - The complete directory of all pages
-* (P)age (T)able - A singular entry in the PD, 
+* (P)age (T)able - A singular entry in the PD,
 *   containing a vector of addresses and a present states
 * (P)age (D)irectory (I)ndex - An offset to an index in the PD
 * (P)age (T)able (I)ndex - An offset to an index in the PT
 */
 
-
 /* Note on why there isn't PhysMem -> VMem
 *
 *
-* Physical memory is not aware of virtual memory's existence, thus
+ Physical memory is not aware of virtual memory's existence, thus
 * physical memory cannot be translated back to virtual memory addresses
 */
-
 
 /* Note on usage of `usize`:
 *
@@ -42,11 +41,14 @@ pub const DIRECTORY_ENTRIES: usize = 1024;
 * many type casts
 */
 
-#[derive(Debug, Clone)]
-pub struct PageTableEntry {
+// TODO: Use more match statements instead of the `is_none()... unwrap()` situations we have
 
+#[derive(Debug, Clone, Copy)]
+pub struct PageTableEntry {
     // A PhysMem address for the frame
     frame_address: Option<usize>,
+
+    // Whether or not it exists
     present: bool,
 }
 
@@ -61,8 +63,6 @@ impl PageTableEntry {
 
 #[derive(Debug, Clone)]
 struct PageTable {
-    // TODO: This will hold a fixed number of entries
-    // We can optimize it to be a heap array, but for now, I'll leave it as a vector
     entries: Vec<PageTableEntry>,
 }
 
@@ -76,7 +76,6 @@ impl PageTable {
 
 #[derive(Debug)]
 struct PageDirectory {
-    // TODO: This is also a fixed entry count, and can be changed to a heap array
     tables: Vec<Option<PageTable>>,
 }
 
@@ -90,18 +89,19 @@ impl PageDirectory {
 
 #[derive(Debug)]
 struct PhysicalMemory {
-    frames: Vec<Option<Vec<u8>>>, // these are values at addresses
+    frames: Vec<Option<Vec<u8>>>,     // these are values at addresses
     allocated_frames: HashSet<usize>, // these are addresses of frames in use
 }
 
 impl PhysicalMemory {
     fn new() -> Self {
         PhysicalMemory {
-            frames: Vec::new(),
-            allocated_frames: HashSet::new(),
+            frames: Vec::with_capacity(DEFAULT_FRAME_COUNT),
+            allocated_frames: HashSet::with_capacity(DEFAULT_FRAME_COUNT),
         }
     }
 
+    #[inline(always)]
     fn allocate_frame(&mut self) -> usize {
         let frame_address = self.frames.len() * PAGE_SIZE;
         self.frames.push(Some(vec![0; PAGE_SIZE])); // By default, push a bunch of 0's to a new
@@ -110,16 +110,24 @@ impl PhysicalMemory {
         frame_address
     }
 
+    #[inline(always)]
     fn deallocate_frame(&mut self, frame_address: usize) -> Result<(), Box<dyn Error>> {
         let frame_index = frame_address / PAGE_SIZE;
+
+        // Frame is OOB or the frame has not been allocated
         if frame_index >= self.frames.len() || self.frames[frame_index].is_none() {
             return Err("Invalid frame address".into());
         }
+
+        // Remove it from the vector
         self.frames[frame_index] = None;
+
+        // Stop remembering the frame address
         self.allocated_frames.remove(&frame_address);
         Ok(())
     }
 
+    #[inline(always)]
     fn read(&self, frame_address: usize, offset: usize) -> Result<u8, Box<dyn Error>> {
         let frame_index = frame_address / PAGE_SIZE;
         if let Some(frame) = &self.frames[frame_index] {
@@ -129,9 +137,13 @@ impl PhysicalMemory {
         }
     }
 
+    #[inline(always)]
     fn write(
         &mut self,
+        // Full address of the frame
         frame_address: usize,
+
+        // Offset from the first index of the frame
         offset: usize,
         value: u8,
     ) -> Result<(), Box<dyn Error>> {
@@ -167,93 +179,99 @@ impl VirtualMemoryManager {
 
     // (P)age (T)able (I)ndex
     // (P)age (D)irectory (I)ndex
+    #[inline(always)]
     pub fn translate_address(&mut self, virtual_address: usize) -> Result<usize, Box<dyn Error>> {
-
         // Mask and bitshift to find the indices
 
         /*
-        * 
-        *
-        * Example PDI and PTI retrieval from an address
-        * 
-        * Address:
-        * +------------+
-        * | 0x33221100 |
-        * +------------+
-        *
-        * Let's expand this address
-        *
-        * +----------------------------------+
-        * | 0b110011001000100001000100000000 |
-        * +----------------------------------+
-        * 
-        * This is our full, 32-bit wide address in binary
-        *
-        * Let's expand the parts of this address
-        *
-        *     │ 00 1100 1100 │ 10 0010 0001 │ 0001 0000 0000 │
-        *     ├─^^─^^^^─^^^^ ├─^^─^^^^─^^^^ ├─^^^^─^^^^─^^^^──────────────┐
-        *     │              │              │  This is the offset         │
-        *     │              │              │  of the address in the page │
-        *     │              │              └─────────────────────────────┘
-        *     │              │
-        *     │              ├────────────────────────────────────────────┐
-        *     │              │  This is the offset in a page table record │
-        *     │              │  for the specific page (4KB)               │
-        *     │              └────────────────────────────────────────────┘
-        *     │
-        * ┌───┴──────────────────────────────────────────────────────────────┐
-        * │  This is the offset in the Page Directory for the exact entry.   │
-        * │  The offset contains a specific page table record, which is used │
-        * │  to then find the specific page that the address resides at.     │
-        * └──────────────────────────────────────────────────────────────────┘
-        */ 
+         *
+         *
+         * Example PDI and PTI retrieval from an address
+         *
+         * Address:
+         * +------------+
+         * | 0x33221100 |
+         * +------------+
+         *
+         * Let's expand this address
+         *
+         * +----------------------------------+
+         * | 0b110011001000100001000100000000 |
+         * +----------------------------------+
+         *
+         * This is our full, 32-bit wide address in binary
+         *
+         * Let's expand the parts of this address
+         *
+         *     │ 00 1100 1100 │ 10 0010 0001 │ 0001 0000 0000 │
+         *     ├─^^─^^^^─^^^^ ├─^^─^^^^─^^^^ ├─^^^^─^^^^─^^^^──────────────┐
+         *     │              │              │  This is the offset         │
+         *     │              │              │  of the address in the page │
+         *     │              │              └─────────────────────────────┘
+         *     │              │
+         *     │              ├────────────────────────────────────────────┐
+         *     │              │  This is the offset in a page table record │
+         *     │              │  for the specific page (4KB)               │
+         *     │              └────────────────────────────────────────────┘
+         *     │
+         * ┌───┴──────────────────────────────────────────────────────────────┐
+         * │  This is the offset in the Page Directory for the exact entry.   │
+         * │  The offset contains a specific page table record, which is used │
+         * │  to then find the specific page that the address resides at.     │
+         * └──────────────────────────────────────────────────────────────────┘
+         */
+
         let pdi = (virtual_address >> 22) & 0x3FF;
         let pti = (virtual_address >> 12) & 0x3FF;
         let offset = virtual_address & 0xFFF;
 
         // Check if the Page Directory has registered this PDI
-        if self.page_directory.tables[pdi].is_none() {
-            // Make a new one
-            self.page_directory.tables[pdi] = Some(PageTable::new());
-        }
+        let page_table = match self.page_directory.tables[pdi] {
+            None => {
+                // Make a new one
+                self.page_directory.tables[pdi] = Some(PageTable::new());
+                // The PD will have this PDI registered now
+                self.page_directory.tables[pdi].as_mut().unwrap()
+            }
+            Some(ref mut table) => table,
+        };
 
-        // The PD will have this PDI registered now
-        let page_table = self.page_directory.tables[pdi].as_mut().unwrap();
+        let frame_address = match page_table.entries[pti].frame_address {
+            // Register the PTI info in the PT if it has not been set
+            None => {
+                // Create a new frame in PhysMem
+                let frame_address = self.physical_memory.allocate_frame();
+                // Set the entry to have the frame address we just retrieved
+                page_table.entries[pti].frame_address = Some(frame_address);
+                frame_address
+            }
+            Some(addr) => addr,
+        };
 
-        // Register the PTI info in the PT if it has not been set
-        if !page_table.entries[pti].present {
-            // Create a new frame in PhysMem
-            let frame_address = self.physical_memory.allocate_frame();
-
-            // Set the entry to have the frame address we just retrieved
-            page_table.entries[pti].frame_address = Some(frame_address);
-            page_table.entries[pti].present = true;
-        }
-
-        // We now look through the PT and find the PhysMem frame address
-        let frame_address = page_table.entries[pti].frame_address.unwrap();
         Ok(frame_address + offset)
     }
 
+    #[inline(always)]
     pub fn deallocate_address(&mut self, virtual_address: usize) -> Result<(), Box<dyn Error>> {
         // Mask and bitshift to find indices
         let pdi = (virtual_address >> 22) & 0x3FF;
         let pti = (virtual_address >> 12) & 0x3FF;
 
-        // This PDI has not been allocated
         if self.page_directory.tables[pdi].is_none() {
             return Ok(());
         }
+        let page_table = match self.page_directory.tables[pdi] {
+            // This PDI has not been allocated - done
+            None => return Ok(()),
+            Some(ref mut p) => p,
+        };
 
-        let page_table = self.page_directory.tables[pdi].as_mut().unwrap();
+        let frame_address = match page_table.entries[pti].frame_address {
+            // This PTI has not been allocated - done
+            None => return Ok(()),
+            Some(entry) => entry,
+        };
 
-        // This PTI has not been allocated
-        if !page_table.entries[pti].present {
-            return Ok(());
-        }
-
-        let frame_address = page_table.entries[pti].frame_address.unwrap();
         self.physical_memory.deallocate_frame(frame_address)?;
         page_table.entries[pti].present = false;
         page_table.entries[pti].frame_address = None;
@@ -265,6 +283,8 @@ impl VirtualMemoryManager {
 
         Ok(())
     }
+
+    #[inline(always)]
     pub fn write_memory(
         &mut self,
         virtual_address: usize,
@@ -276,6 +296,7 @@ impl VirtualMemoryManager {
         self.physical_memory.write(frame_address, offset, value)
     }
 
+    #[inline(always)]
     pub fn read_memory(&mut self, virtual_address: usize) -> Result<u8, Box<dyn Error>> {
         let physical_address = self.translate_address(virtual_address)?;
         let offset = virtual_address & 0xFFF;
@@ -308,4 +329,83 @@ impl VirtualMemoryManager {
             }
         }
     }
+}
+
+#[derive(Debug)]
+pub struct Machine {
+    memory: VirtualMemoryManager,
+}
+const FIRST_AVAILABLE_ADDRESS: usize = 0x20000;
+impl Machine {
+    pub fn new() -> Self {
+        Self {
+            memory: VirtualMemoryManager::new(),
+        }
+    }
+    pub fn create_bitmap(&mut self) -> Result<(), Box<dyn Error>> {
+        // We need to create a bitmap at the lower addresses 0x0000 -> 0x5000
+        // Each index in the bitmap represents a bit being on or off
+        for i in 0..=FIRST_AVAILABLE_ADDRESS {
+            self.memory.write_memory(i, 0)?;
+        }
+        Ok(())
+    }
+    pub fn alloc(&mut self) -> Result<usize, Box<dyn Error>> {
+        // We need to find the first available bit
+        let mut available_addr = 0;
+        let mut available_index = 0;
+        let mut found = false;
+        'outer: for i in 0..=FIRST_AVAILABLE_ADDRESS {
+            let mut current_addr_value = self.memory.read_memory(i)?;
+            for j in 0..8 {
+                if (current_addr_value >> j) & 1 == 0 {
+                    current_addr_value |= 1 << j;
+                    self.memory.write_memory(i, current_addr_value)?;
+                    available_addr = i;
+                    available_index = j;
+                    found = true;
+                    break 'outer;
+                }
+            }
+        }
+        if !found {
+            return Err("No address found".into());
+        }
+        return Ok(FIRST_AVAILABLE_ADDRESS + ((available_addr * 8) + available_index) * PAGE_SIZE);
+    }
+    pub fn is_allocated(&mut self, virt_addr: usize) -> Result<bool, Box<dyn Error>> {
+        let bitmap_index = (virt_addr - FIRST_AVAILABLE_ADDRESS) / PAGE_SIZE / 8;
+        let bitentry_index = (virt_addr - FIRST_AVAILABLE_ADDRESS) / PAGE_SIZE;
+        let bitmap_value = self.memory.read_memory(bitmap_index)?;
+        let new_value = bitmap_value & !(1 << (bitentry_index % 8));
+        Ok(bitmap_value != new_value)
+    }
+    pub fn is_not_allocated(&mut self, virt_addr: usize) -> Result<bool, Box<dyn Error>> {
+        Ok(!(self.is_allocated(virt_addr)?))
+    }
+    pub fn write(&mut self, virt_addr: usize, value: u8) -> Result<(), Box<dyn Error>> {
+        if self.is_not_allocated(virt_addr)? {
+            return Err("Segmentation fault".into());
+        }
+        Ok(self.memory.write_memory(virt_addr, value)?)
+    }
+    pub fn read(&mut self, virt_addr: usize) -> Result<u8, Box<dyn Error>> {
+        if self.is_not_allocated(virt_addr)? {
+            return Err("Segmentation fault".into());
+        }
+        Ok(self.memory.read_memory(virt_addr)?)
+    }
+    pub fn dealloc(&mut self, virt_addr: usize) -> Result<(), Box<dyn Error>> {
+        let bitmap_index = (virt_addr - FIRST_AVAILABLE_ADDRESS) / PAGE_SIZE / 8;
+        let bitentry_index = (virt_addr - FIRST_AVAILABLE_ADDRESS) / PAGE_SIZE;
+        let bitmap_value = self.memory.read_memory(bitmap_index)?;
+        let new_value = bitmap_value & !(1 << (bitentry_index % 8));
+        self.memory.write_memory(bitmap_index, new_value)?;
+        Ok(())
+    }
+}
+
+pub fn info() {
+    let addressable_space = FIRST_AVAILABLE_ADDRESS * 8 * PAGE_SIZE;
+    println!("This allocator can allocate 0x{addressable_space} memory addresses");
 }

@@ -1,6 +1,6 @@
 # The Chronos VM x32 System
 <p align="center">
- <img src="MiscellanousFiles/eBF_icon.svg" alt="Chronos VM logo" width="250" height="250">
+ <img src="misc/eBF_icon.svg" alt="Chronos VM logo" width="250" height="250">
 </p>
 
 ### To-do list
@@ -16,7 +16,7 @@
 - The Chronos VM x32 System is a computer built for the Gaia Bytecode, and is built with Java as metacode.
 - This project was made as a fun experiment. It is inspired by the various iterations of Excel Computers seen on Youtube, but has since transformed into a separate concept entirely.
 <p align="center">
- <img src="MiscellanousFiles/ePU Schematic.png" alt="Chronos VM x32 Schematic" width="500" height="500">
+ <img src="misc/ePU Schematic.png" alt="Chronos VM x32 Schematic" width="500" height="500">
 </p>
 
 ### Features
